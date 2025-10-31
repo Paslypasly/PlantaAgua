@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard de Pedidos{% endblock %}
+{% block content %}
+
+<!-- KPIs -->
+<div class="grid grid-4" style="margin-bottom:16px">
+  <div class="card">
+    <small>Entregados</small>
+    <div class="kpi">{{ kpis.entregado }}</div>
+    <span class="tag">OK</span>
+  </div>
+  <div class="card">
+    <small>En ruta</small>
+    <div class="kpi">{{ kpis.en_ruta }}</div>
+    <span class="tag">Despacho</span>
+  </div>
+  <div class="card">
+    <small>En preparación</small>
+    <div class="kpi">{{ kpis.preparacion }}</div>
+    <span class="tag">Picking</span>
+  </div>
+  <div class="card">
+    <small>Ventas del día</small>
+    <div class="kpi">${{ kpis.ventas_hoy|floatformat:0 }}</div>
+    <span class="tag">Total</span>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid" style="grid-template-columns: 2fr 1fr; margin-bottom:16px">
+  <div class="card">
+    <small>Pedidos últimos 7 días</small>
+    <canvas id="chartPedidos"></canvas>
+  </div>
+  <div class="card">
+    <small>Estados actuales</small>
+    <canvas id="chartEstados"></canvas>
+  </div>
+</div>
+
+<!-- Filtro -->
+<div class="card" style="margin-bottom:12px">
+  <form method="get">
+    <label>Filtrar estado:
+      <select name="estado" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for s in stats %}
+          <option value="{{ s.estado }}" {% if estado_filtro == s.estado %}selected{% endif %}>{{ s.estado }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Planta</th><th>Estado</th><th>Total</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for p in pedidos %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.fecha|date:"Y-m-d H:i" }}</td>
+        <td>{{ p.cliente }}</td>
+        <td>{{ p.planta.codigo }}</td>
+        <td><span class="tag">{{ p.estado }}</span></td>
+        <td>${{ p.total }}</td>
+        <td>—</td>
+      </tr>
+      {% empty %}
+        <tr><td colspan="7">Sin pedidos</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Datos que vienen de la vista
+  const labels = {{ chart.labels|safe }};
+  const dataPedidos = {{ chart.cantidades|safe }};
+  const estadosLabels = {{ chart_estados.labels|safe }};
+  const estadosData   = {{ chart_estados.valores|safe }};
+
+  new Chart(document.getElementById('chartPedidos'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Pedidos', data: dataPedidos, tension:.3, fill:true }]},
+    options: { plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  new Chart(document.getElementById('chartEstados'), {
+    type: 'doughnut',
+    data: { labels: estadosLabels, datasets: [{ data: estadosData }]},
+    options: { plugins:{legend:{position:'bottom'}} }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Pedido #{{ p.id }}{% endblock %}
+{% block content %}
+<h1>Pedido #{{ p.id }}</h1>
+<div class="grid grid-2" style="margin-bottom:12px">
+  <div class="card">
+    <p><b>Cliente:</b> {{ p.cliente }}</p>
+    <p><b>Planta:</b> {{ p.planta.codigo }}</p>
+    <p><b>Estado:</b> <span class="chip">{{ p.estado }}</span></p>
+    <p><b>Fecha:</b> {{ p.fecha|date:"Y-m-d H:i" }}</p>
+    <p><b>Observación:</b> {{ p.observacion|default:"—" }}</p>
+  </div>
+  <div class="card">
+    <p><b>Total:</b> ${{ p.total }}</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Ítems</h3>
+  <table class="table">
+    <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th></tr></thead>
+    <tbody>
+      {% for it in items %}
+        <tr><td>{{ it.descripcion }}</td><td>{{ it.cantidad }}</td><td>${{ it.precio_unit }}</td></tr>
+      {% empty %}
+        <tr><td colspan="3">Sin ítems</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
