@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Inventario - Movimientos{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Movimientos de inventario</h1>
+
+<a href="{% url 'inventario_movimiento_nuevo' %}" class="btn btn-primary btn-sm mb-3">
+    Registrar movimiento
+</a>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>Fecha</th>
+            <th>Insumo</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Motivo</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for mov in movimientos %}
+            <tr>
+                <td class="small">{{ mov.fecha|date:"d-m-Y H:i" }}</td>
+                <td class="small">{{ mov.insumo }}</td>
+                <td class="small">{{ mov.get_tipo_movimiento_display }}</td>
+                <td class="small">{{ mov.cantidad }}</td>
+                <td class="small">{{ mov.motivo|default:"-" }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="small text-muted">No hay movimientos registrados.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Nuevo movimiento de inventario{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Registrar movimiento de inventario</h1>
+
+<form method="post" class="card shadow-sm p-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+    <a href="{% url 'inventario_movimientos' %}" class="btn btn-secondary btn-sm">Cancelar</a>
+</form>
+{% endblock %}

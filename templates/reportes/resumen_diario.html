@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Resumen diario{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Resumen diario - {{ fecha|date:"d-m-Y" }}</h1>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-start border-primary border-3">
+            <div class="card-body">
+                <div class="text-muted small">Pedidos del día</div>
+                <div class="fs-3 fw-semibold">{{ pedidos_hoy }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-start border-success border-3">
+            <div class="card-body">
+                <div class="text-muted small">Lotes producidos</div>
+                <div class="fs-3 fw-semibold">{{ produccion_hoy }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-start border-danger border-3">
+            <div class="card-body">
+                <div class="text-muted small">Insumos con stock bajo</div>
+                <div class="fs-3 fw-semibold">{{ insumos_bajos }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

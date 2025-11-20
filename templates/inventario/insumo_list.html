@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Inventario - Insumos{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Inventario de insumos</h1>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Stock actual</th>
+            <th>Unidad</th>
+            <th>Activo</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for insumo in insumos %}
+            <tr>
+                <td class="small">{{ insumo.nombre }}</td>
+                <td class="small">{{ insumo.tipo|default:"-" }}</td>
+                <td class="small">{{ insumo.stock_actual }}</td>
+                <td class="small">{{ insumo.unidad|default:"-" }}</td>
+                <td class="small">
+                    {% if insumo.activo %}
+                        <span class="badge bg-success">Sí</span>
+                    {% else %}
+                        <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="small text-muted">No hay insumos registrados.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

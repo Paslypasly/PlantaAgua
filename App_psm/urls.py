@@ -23,6 +23,13 @@ urlpatterns = [
     path("planta/", include("planta.urls")),
     path("cuentas/", include("cuentas.urls")),
     path("", include("pages.urls")), 
+    path("inventario/", include("inventario.urls")),
+    path("proveedores/", include("proveedores.urls")),
+    path("compras/", include("compras.urls")),
+    path("clientes/", include("clientes.urls")),
+    path("ventas/", include("ventas.urls")),
+    path("logistica/", include("logistica.urls")),
+    path("reportes/", include("reportes.urls")),
 
 
 ]

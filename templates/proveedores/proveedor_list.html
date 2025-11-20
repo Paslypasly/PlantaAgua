@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Proveedores{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Proveedores</h1>
+
+<a href="{% url 'proveedor_nuevo' %}" class="btn btn-primary btn-sm mb-3">
+    Nuevo proveedor
+</a>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>Nombre</th>
+            <th>RUT</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Activo</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in proveedores %}
+            <tr>
+                <td class="small">{{ p.nombre }}</td>
+                <td class="small">{{ p.get_rut_completo }}</td>
+                <td class="small">{{ p.email|default:"-" }}</td>
+                <td class="small">{{ p.telefono|default:"-" }}</td>
+                <td class="small">
+                    {% if p.activo %}
+                        <span class="badge bg-success">Sí</span>
+                    {% else %}
+                        <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="small text-muted">No hay proveedores registrados.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
