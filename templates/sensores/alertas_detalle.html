@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Detalle alerta{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold">
+            Alerta en {{ alerta.sensor.nombre }}
+        </div>
+        <div class="card-body">
+            <p><strong>Fecha:</strong> {{ alerta.created_at|date:"d-m-Y H:i:s" }}</p>
+            <p><strong>Severidad:</strong> {{ alerta.severidad }}</p>
+            <p><strong>Estado:</strong> {{ alerta.estado }}</p>
+            <p><strong>Mensaje:</strong></p>
+            <p>{{ alerta.mensaje }}</p>
+
+            <a href="{% url 'alertas_list' %}" class="btn btn-outline-secondary">
+                Volver a listado
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,34 +1,46 @@
 {% extends "base.html" %}
-
-{% block title %}Gestión de usuario{% endblock %}
+{% block title %}Usuario{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h1 class="h5 mb-3">
-          {% if object %}Editar usuario{% else %}Nuevo usuario{% endif %}
-        </h1>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
 
-        <form method="post">
-          {% csrf_token %}
-          {{ form.non_field_errors }}
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    {% if object %}Editar usuario{% else %}Nuevo usuario{% endif %}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
 
-          {% for field in form %}
-            <div class="mb-3">
-              <label class="form-label">{{ field.label }}</label>
-              {{ field }}
-              {{ field.errors }}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'usuarios_list' %}" class="btn btn-outline-secondary">
+                                Volver
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-          {% endfor %}
 
-          <button class="btn btn-primary w-100" type="submit">
-            Guardar
-          </button>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

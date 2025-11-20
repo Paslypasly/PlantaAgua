@@ -1,24 +1,49 @@
 {% extends "base.html" %}
-{% block title %}Contacto{% endblock %}
+{% block title %}Contacto - Planta San Miguel{% endblock %}
 
 {% block content %}
-<h1 class="h4 mb-3">Contacto</h1>
 
-<form class="card shadow-sm p-3">
-    <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input type="text" class="form-control" disabled placeholder="Formulario demo">
+<div class="container my-5">
+
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Formulario de Contacto</h1>
+        <p class="lead">Envíanos tus consultas o sugerencias.</p>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Correo</label>
-        <input type="email" class="form-control" disabled>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-sm p-4">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" placeholder="Tu nombre completo">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" placeholder="email@ejemplo.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mensaje</label>
+                        <textarea class="form-control" rows="5" placeholder="Escribe tu mensaje aquí"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">
+                        Enviar mensaje
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Mensaje</label>
-        <textarea class="form-control" rows="3" disabled></textarea>
-    </div>
-    <button type="button" class="btn btn-secondary btn-sm" disabled>
-        Enviar (demo)
-    </button>
-</form>
+
+</div>
+
 {% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Alertas de sensores{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-3">Alertas de sensores</h2>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <select name="estado" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                <option value="ABIERTA" {% if request.GET.estado == "ABIERTA" %}selected{% endif %}>Abiertas</option>
+                <option value="CERRADA" {% if request.GET.estado == "CERRADA" %}selected{% endif %}>Cerradas</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-sm btn-primary" type="submit">
+                Filtrar
+            </button>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Sensor</th>
+                            <th>Severidad</th>
+                            <th>Mensaje</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in alertas %}
+                            <tr>
+                                <td>{{ a.created_at|date:"d-m-Y H:i" }}</td>
+                                <td>{{ a.sensor.nombre }}</td>
+                                <td>{{ a.severidad }}</td>
+                                <td>{{ a.mensaje|truncatechars:60 }}</td>
+                                <td>{{ a.estado }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'alerta_detalle' a.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">
+                                    No hay alertas registradas.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

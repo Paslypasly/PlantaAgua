@@ -1,27 +1,71 @@
 {% extends "base.html" %}
-{% block title %}Inicio{% endblock %}
+{% block title %}Inicio - Planta San Miguel{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h1 class="h3 mb-3">Planta Purificadora San Miguel</h1>
-                <p class="lead">
-                    Sistema de gestión e IoT para monitorear la planta, sensores y procesos
-                    de distribución de agua purificada.
-                </p>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'panel_por_rol' %}" class="btn btn-primary">
-                        Ir a mi panel
-                    </a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary">
-                        Iniciar sesión
-                    </a>
-                {% endif %}
-            </div>
-        </div>
+
+<!-- Hero principal -->
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+    <div class="container py-5 text-center">
+        <h1 class="display-5 fw-bold mb-3">
+            Bienvenido(a) a Planta Purificadora San Miguel
+        </h1>
+        <p class="fs-5">
+            Sistema IoT y plataforma integral para la gestión de producción,
+            sensores, logística y control de calidad del agua purificada.
+        </p>
+
+        <img src="https://images.unsplash.com/photo-1526401485004-2fda9f4be0f3?w=1200"
+             class="img-fluid rounded-3 shadow mt-4" alt="Planta de agua">
     </div>
 </div>
+
+<!-- Sección de tarjetas -->
+<div class="container my-5">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <img src="https://images.unsplash.com/photo-1581092334660-1c967f5b8f88?w=800"
+                     class="card-img-top" alt="Sensores IoT">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold">Monitoreo IoT en tiempo real</h5>
+                    <p class="card-text">
+                        Control automático del nivel de estanques, purificación,
+                        bombeo y alertas inteligentes mediante sensores IoT.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <img src="https://images.unsplash.com/photo-1625246333195-78a28b5df2a3?w=800"
+                     class="card-img-top" alt="Logística">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold">Logística optimizada</h5>
+                    <p class="card-text">
+                        Programación de rutas, seguimiento de camiones y
+                        gestión eficiente de entregas y pedidos de clientes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <img src="https://images.unsplash.com/photo-1581090700227-1e37b2c7d3e5?w=800"
+                     class="card-img-top" alt="Gestión integral">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold">Gestión de negocio</h5>
+                    <p class="card-text">
+                        Inventario, ventas, producción, calidad y reportes centralizados
+                        en una única plataforma profesional.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}

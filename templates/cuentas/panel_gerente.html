@@ -2,35 +2,66 @@
 {% block title %}Panel Gerente{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">Panel Gerente</h1>
+<div class="container my-4">
+    <h2 class="mb-4">Panel Gerente</h2>
 
-<div class="row g-3">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-speedometer2"></i> KPI Operacionales
-                </h5>
-                <p class="card-text small">
-                    Acceso rápido a estado de planta y alertas críticas.
-                </p>
-                <a href="{% url 'dashboard_planta' %}" class="btn btn-primary btn-sm">Ver dashboard</a>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Ventas mes</h6>
+                    <p class="fs-3 mb-1">{{ ventas_mes|default:"-" }}</p>
+                    <span class="small text-muted">Bidones o miles de $</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Clientes activos</h6>
+                    <p class="fs-3 mb-1">{{ clientes_activos|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Producción mes</h6>
+                    <p class="fs-3 mb-1">{{ produccion_mes|default:"-" }} L</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Alertas críticas</h6>
+                    <p class="fs-3 mb-1 text-danger">{{ alertas_criticas|default:"-" }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-bar-chart"></i> Reportes de negocio
-                </h5>
-                <p class="card-text small">
-                    Enlazar con reportes de ventas, clientes y producción.
-                </p>
-                <a href="#" class="btn btn-outline-primary btn-sm disabled">En construcción</a>
-            </div>
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold">
+            Reportes clave
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-0">
+                <li class="mb-2">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Resumen diario de producción
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Ventas por cliente y zona
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Índice de fallas y alertas IoT
+                </li>
+            </ul>
         </div>
     </div>
+
 </div>
 {% endblock %}

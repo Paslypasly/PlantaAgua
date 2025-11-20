@@ -1,0 +1,9 @@
+<div class="card mb-3 shadow-sm">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Estado del pedido #{{ pedido.id }}</h2>
+    <p class="mb-1"><strong>Cliente:</strong> {{ pedido.cliente.nombre }}</p>
+    <p class="mb-1"><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
+    <p class="mb-1"><strong>Estado:</strong> {{ pedido.get_estado_display }}</p>
+    <p class="mb-1"><strong>Fecha compromiso:</strong> {{ pedido.fecha_compromiso }}</p>
+  </div>
+</div>

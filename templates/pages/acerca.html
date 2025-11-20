@@ -1,10 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Acerca de{% endblock %}
+{% block title %}Acerca de - Planta San Miguel{% endblock %}
 
 {% block content %}
-<h1 class="h4 mb-3">Acerca del sistema</h1>
-<p class="small">
-    Este sistema fue desarrollado como proyecto de integración para la Planta Purificadora San Miguel,
-    integrando Django, PostgreSQL, IoT con ESP32, MQTT y buenas prácticas de arquitectura.
-</p>
+
+<div class="container my-5">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Acerca de la Planta Purificadora San Miguel</h1>
+        <p class="lead">
+            Tecnología, automatización y calidad al servicio del agua purificada.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <img src="https://images.unsplash.com/photo-1523861751938-3c60866a8048?w=1200"
+                 class="img-fluid rounded shadow-sm" alt="Planta">
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center">
+            <p class="fs-5">
+                Somos una planta ubicada en Antofagasta dedicada a la producción de agua purificada
+                mediante sistemas automatizados y sensores IoT.  
+                Nuestro sistema integra:
+                <ul>
+                    <li>Monitoreo de estanques en tiempo real</li>
+                    <li>Control automatizado de bombas</li>
+                    <li>Procesos de sanitización y calidad</li>
+                    <li>Gestión de clientes, ventas y logística</li>
+                </ul>
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
 {% endblock %}

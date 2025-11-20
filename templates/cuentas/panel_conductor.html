@@ -2,20 +2,34 @@
 {% block title %}Panel Conductor{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">Panel Conductor</h1>
+<div class="container my-4">
+    <h2 class="mb-4">Panel Conductor</h2>
 
-<div class="alert alert-info small">
-    Aquí el conductor verá sus pedidos del día y rutas asignadas.
-</div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">
+            Rutas y pedidos del día
+        </div>
+        <div class="card-body">
+            <p class="mb-2">
+                Aquí se mostrarán los pedidos asignados y las rutas programadas
+                para tus despachos.
+            </p>
+            <p class="text-muted small mb-0">
+                Próximamente se integrará el seguimiento GPS / ubicación del camión.
+            </p>
+        </div>
+    </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title">
-            <i class="bi bi-truck"></i> Rutas y pedidos
-        </h5>
-        <p class="card-text small">
-            Próximamente se integrará con el módulo de logística (rutas y entregas).
-        </p>
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold">
+            Próximas entregas
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-0">
+                Cuando el módulo de logística esté completo, aquí verás el detalle
+                de las paradas, horarios y estado de cada entrega.
+            </p>
+        </div>
     </div>
 </div>
 {% endblock %}

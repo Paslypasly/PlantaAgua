@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Ayuda - Planta San Miguel{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Centro de Ayuda</h1>
+        <p class="lead">Encuentra respuestas rápidas a tus dudas.</p>
+    </div>
+
+    <div class="accordion" id="ayudaAccordion">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q1">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#a1">
+                    ¿Cómo iniciar sesión en la plataforma?
+                </button>
+            </h2>
+            <div id="a1" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    Usa tu nombre de usuario y contraseña. Si no tienes acceso,
+                    solicita a un administrador que cree tu cuenta.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q2">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a2">
+                    ¿Cómo ver el estado de los estanques?
+                </button>
+            </h2>
+            <div id="a2" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Desde el menú lateral, selecciona <strong>Planta → Estado de estanques</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q3">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a3">
+                    ¿Dónde veo mis pedidos asignados (conductores)?
+                </button>
+            </h2>
+            <div id="a3" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    En el menú lateral, selecciona <strong>Pedidos asignados</strong>.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

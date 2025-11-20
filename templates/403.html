@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Acceso denegado (403){% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+    <h1 class="display-4 text-danger mb-3">403</h1>
+    <p class="lead mb-4">No tienes permiso para acceder a esta página.</p>
+
+    <a href="{% url 'home' %}" class="btn btn-primary">
+        Volver al inicio
+    </a>
+</div>
+{% endblock %}

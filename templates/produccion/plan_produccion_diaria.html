@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Plan de Producción Diaria{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">
+    <i class="bi bi-calendar-check"></i> Plan de Producción · {{ hoy|date:"d-m-Y" }}
+</h1>
+
+<div class="mb-3">
+    <span class="badge bg-primary">
+        Total estimado hoy: {{ total_litros_hoy }} L
+    </span>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th># Lote</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    <th>Estanque</th>
+                    <th>Litros</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for lote in lotes_hoy %}
+                <tr>
+                    <td>{{ lote.id }}</td>
+                    <td>{{ lote.hora_inicio|time:"H:i" }}</td>
+                    <td>{{ lote.hora_fin|time:"H:i" }}</td>
+                    <td>{{ lote.estanque.nombre|default:"-" }}</td>
+                    <td>{{ lote.litros_producidos|default:"-" }}</td>
+                    <td>{{ lote.estado|default:"-" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'orden_produccion_detalle' lote.pk %}"
+                           class="btn btn-sm btn-outline-primary">
+                            Ver detalle
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-3">
+                        No hay plan de producción cargado para hoy.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

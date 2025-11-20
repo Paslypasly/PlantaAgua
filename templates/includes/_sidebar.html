@@ -1,0 +1,46 @@
+<div class="list-group list-group-flush">
+
+    <div class="list-group-item fw-semibold bg-light text-uppercase small">
+        Menú principal
+    </div>
+
+    {% if user.rol == "ADMIN" %}
+        <a href="{% url 'usuarios_list' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Usuarios
+        </a>
+        <a href="{% url 'estado_inventario' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-boxes"></i> Inventario
+        </a>
+        <a href="{% url 'resumen_diario' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-graph-up"></i> Reportes
+        </a>
+    {% endif %}
+
+    {% if user.rol == "OPERARIO" %}
+        <a href="{% url 'estado_estanques' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-droplet-half"></i> Estanques
+        </a>
+        <a href="{% url 'sensores_dashboard' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-activity"></i> Sensores
+        </a>
+        <a href="{% url 'pedidos_hoy_operario' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-cart-check"></i> Pedidos Hoy
+        </a>
+    {% endif %}
+
+    {% if user.rol == "CONDUCTOR" %}
+        <a href="{% url 'pedidos_conductor' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-truck"></i> Pedidos Asignados
+        </a>
+    {% endif %}
+
+    {% if user.rol == "GERENTE" %}
+        <a href="{% url 'resumen_diario' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-clipboard-data"></i> Indicadores diarios
+        </a>
+        <a href="{% url 'resumen_mensual' %}" class="list-group-item list-group-item-action">
+            <i class="bi bi-calendar-check"></i> Reportes mensuales
+        </a>
+    {% endif %}
+
+</div>

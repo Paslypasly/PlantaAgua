@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Formulario de pedido{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">
+  {% if object %}Editar pedido{% else %}Nuevo pedido{% endif %}
+</h1>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label">{{ field.label }}</label>
+      {{ field }}
+      {{ field.errors }}
+    </div>
+  {% endfor %}
+
+  <button class="btn btn-primary" type="submit">Guardar</button>
+  <a href="{% url 'pedidos_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

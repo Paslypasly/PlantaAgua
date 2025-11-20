@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Detalle sensor{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-3">Sensor: {{ sensor.nombre }}</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    Información del sensor
+                </div>
+                <div class="card-body">
+                    <p><strong>Código:</strong> {{ sensor.codigo }}</p>
+                    <p><strong>Tipo:</strong> {{ sensor.tipo.descripcion }}</p>
+                    <p><strong>Ubicación:</strong> {{ sensor.ubicacion|default:"-" }}</p>
+                    <p><strong>Unidad:</strong> {{ sensor.unidad|default:"-" }}</p>
+                    <p><strong>Estado:</strong> {{ sensor.estado|default:"-" }}</p>
+                    <p><strong>Activo:</strong>
+                        {% if sensor.activo %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header fw-semibold">
+                    Lecturas recientes
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Valor</th>
+                                    <th>Unidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lec in lecturas_recientes %}
+                                    <tr>
+                                        <td>{{ lec.fecha_hora|date:"d-m-Y H:i:s" }}</td>
+                                        <td>{{ lec.valor }}</td>
+                                        <td>{{ lec.unidad }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">
+                                            Aún no hay lecturas para este sensor.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    Alertas recientes de este sensor
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Severidad</th>
+                                    <th>Mensaje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in alertas_sensor %}
+                                    <tr>
+                                        <td>{{ a.created_at|date:"d-m-Y H:i" }}</td>
+                                        <td>{{ a.severidad }}</td>
+                                        <td>{{ a.mensaje }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">
+                                            Este sensor no tiene alertas registradas.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

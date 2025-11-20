@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Control de Planta · Planta San Miguel{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">
+    <i class="bi bi-sliders"></i> Control de Planta (Operario)
+</h1>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                Estado de estanques
+            </div>
+            <div class="card-body">
+                {% if estanques %}
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Estanque</th>
+                                <th>Capacidad (L)</th>
+                                <th>Nivel (%)</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for e in estanques %}
+                            <tr>
+                                <td>{{ e.nombre }}</td>
+                                <td>{{ e.capacidad_litros|default:"-" }}</td>
+                                <td>{{ e.nivel_porcentaje|default:"-" }}</td>
+                                <td>{{ e.estado|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted mb-0">No hay estanques configurados.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Control de bomba (simulado)
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Aquí más adelante conectamos con el ESP32 vía MQTT para encender/apagar la bomba.
+                </p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-sm" disabled>
+                        <i class="bi bi-play-fill"></i> Encender bomba
+                    </button>
+                    <button class="btn btn-danger btn-sm" disabled>
+                        <i class="bi bi-stop-fill"></i> Apagar bomba
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                        Modo automático
+                    </button>
+                </div>
+                <small class="d-block mt-2 text-muted">
+                    Botones deshabilitados en maqueta web; la lógica real se documenta en el informe (ESP32 + MQTT).
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                Últimos lotes de producción
+            </div>
+            <div class="card-body">
+                {% if ultimos_lotes %}
+                    <ul class="list-group list-group-flush">
+                        {% for lote in ultimos_lotes %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">
+                                        Lote #{{ lote.id }} · {{ lote.fecha_produccion|date:"d-m" }}
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ lote.litros_producidos|default:"-" }} L · {{ lote.estado|default:"-" }}
+                                    </small>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No hay lotes recientes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

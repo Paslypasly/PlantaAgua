@@ -1,0 +1,12 @@
+<div class="row g-3">
+    {% for kpi in kpis %}
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted small">{{ kpi.title }}</h6>
+                    <p class="display-6">{{ kpi.value }}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -21,10 +21,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
 
+        <!-- Branding -->
         <a class="navbar-brand fw-semibold" href="{% url 'home' %}">
             Planta San Miguel
         </a>
 
+        <!-- Toggle button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -36,6 +38,7 @@
 
                 {% if user.is_authenticated %}
 
+                    <!-- Panel según rol -->
                     {% if user.rol == "ADMIN" %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'panel_admin' %}">
@@ -65,22 +68,29 @@
                         </li>
                     {% endif %}
 
-                    <!-- Acceso general a planta -->
+                    <!-- Planta & Sensores (usa la vista REAL que tienes) -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard_planta' %}">
+                        <a class="nav-link" href="{% url 'estado_estanques' %}">
                             <i class="bi bi-water"></i> Planta & Sensores
+                        </a>
+                    </li>
+
+                    <!-- Producción (plan_produccion_diaria) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'plan_produccion_diaria' %}">
+                            <i class="bi bi-box"></i> Producción
                         </a>
                     </li>
 
                 {% endif %}
             </ul>
 
-            <!-- ========== MENÚ DERECHO ========== -->
+            <!-- ========== MENÚ DERECHO (LOGIN / USER) ========== -->
             <ul class="navbar-nav mb-2 mb-lg-0">
 
                 {% if user.is_authenticated %}
 
-                    <!-- Usuario -->
+                    <!-- Nombre del usuario -->
                     <li class="nav-item">
                         <span class="navbar-text me-3">
                             <i class="bi bi-person-circle"></i>
@@ -90,7 +100,7 @@
 
                     <!-- Logout seguro -->
                     <li class="nav-item">
-                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button class="btn btn-outline-light btn-sm" type="submit">
                                 Cerrar sesión
@@ -99,7 +109,6 @@
                     </li>
 
                 {% else %}
-
                     <!-- Login -->
                     <li class="nav-item me-2">
                         <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">
@@ -107,13 +116,12 @@
                         </a>
                     </li>
 
-                    <!-- Registro SOLO para clientes -->
+                    <!-- Registro de cliente -->
                     <li class="nav-item">
                         <a class="btn btn-light btn-sm" href="{% url 'registro_cliente' %}">
                             Registrarse como cliente
                         </a>
                     </li>
-
                 {% endif %}
 
             </ul>
@@ -126,7 +134,7 @@
 <div class="container mt-3">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>

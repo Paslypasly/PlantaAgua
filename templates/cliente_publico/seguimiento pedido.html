@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Seguimiento de pedido{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">Seguimiento de pedido</h1>
+<p class="text-muted small mb-4">
+  Ingresa tu RUT y el número de pedido para ver el estado y la ubicación aproximada del despacho.
+</p>
+
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-4">
+    <label class="form-label">RUT (sin puntos ni guion)</label>
+    <input type="text" name="rut" class="form-control"
+           value="{{ request.GET.rut }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Número de pedido</label>
+    <input type="text" name="pedido" class="form-control"
+           value="{{ request.GET.pedido }}">
+  </div>
+  <div class="col-md-4 d-flex align-items-end">
+    <button class="btn btn-primary w-100" type="submit">
+      Buscar
+    </button>
+  </div>
+</form>
+
+{% if pedido %}
+  {% include "cliente_publico/estado_pedido.html" %}
+  <hr class="my-4">
+  {% include "cliente_publico/seguimiento_mapa.html" %}
+{% elif request.GET.rut or request.GET.pedido %}
+  <div class="alert alert-warning">
+    No se encontró un pedido con los datos ingresados.
+  </div>
+{% endif %}
+{% endblock %}

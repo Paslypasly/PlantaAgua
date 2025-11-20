@@ -1,28 +1,37 @@
 # core/mixins.py
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 
 
-class RolRequiredMixin(LoginRequiredMixin):
+class RolRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """
-    Mixin para vistas que requieren que el usuario tenga cierto rol.
-    - Si no está autenticado -> redirige a login.
-    - Si es superuser -> siempre pasa.
-    - Si su rol no está en roles_permitidos -> 403.
+    Mixin para exigir login + rol específico.
+    Si rol_requerido = None, solo exige estar autenticado.
     """
-    roles_permitidos = []
 
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
+    rol_requerido = None  # Ej: "ADMIN", "OPERARIO", etc.
 
-        if not user.is_authenticated:
-            return self.handle_no_permission()
+    def test_func(self):
+        user = self.request.user
 
-        # superusuario siempre puede entrar
+        # Si no hay rol requerido, basta con que esté logueado
+        if self.rol_requerido is None:
+            return user.is_authenticated
+
+        # Súper usuario siempre tiene acceso
         if user.is_superuser:
-            return super().dispatch(request, *args, **kwargs)
+            return True
 
-        if self.roles_permitidos and user.rol not in self.roles_permitidos:
-            raise PermissionDenied("No tienes permiso para ver esta vista.")
+        # Comparamos contra el campo rol del modelo Usuario
+        return getattr(user, "rol", None) == self.rol_requerido
 
-        return super().dispatch(request, *args, **kwargs)
+    def handle_no_permission(self):
+        """
+        Si el usuario no tiene el rol adecuado, lanzamos 403.
+        """
+        if not self.request.user.is_authenticated:
+            # Deja que LoginRequiredMixin redirija a login
+            return super().handle_no_permission()
+
+        # Usuario autenticado pero sin permiso → 403
+        raise PermissionDenied("No tiene permiso para acceder a esta vista.")

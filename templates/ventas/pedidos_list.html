@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">Pedidos</h1>
+
+<table class="table table-sm table-striped align-middle">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Cliente</th>
+      <th>Fecha</th>
+      <th>Estado</th>
+      <th class="text-end">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pedido in pedidos %}
+      <tr>
+        <td>{{ pedido.id }}</td>
+        <td>{{ pedido.cliente.nombre }}</td>
+        <td>{{ pedido.fecha }}</td>
+        <td>{{ pedido.get_estado_display }}</td>
+        <td class="text-end">
+          <a href="{% url 'pedido_detalle' pedido.pk %}"
+             class="btn btn-sm btn-outline-primary">
+            Ver
+          </a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5" class="text-center text-muted small">
+          No hay pedidos registrados.
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

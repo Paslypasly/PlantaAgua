@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Historial de lecturas{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-3">Historial de lecturas</h2>
+
+    <p class="text-muted small">
+        Vista útil para auditorías y análisis de comportamiento de los sensores.
+    </p>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Sensor</th>
+                            <th>Valor</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lec in lecturas %}
+                            <tr>
+                                <td>{{ lec.fecha_hora|date:"d-m-Y H:i:s" }}</td>
+                                <td>{{ lec.sensor.nombre }}</td>
+                                <td>{{ lec.valor }}</td>
+                                <td>{{ lec.unidad }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    No hay lecturas registradas aún.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

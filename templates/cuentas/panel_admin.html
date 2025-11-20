@@ -2,51 +2,83 @@
 {% block title %}Panel Administrador{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">Panel Administrador</h1>
+<div class="container my-4">
 
-<div class="row g-3">
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-people-fill"></i> Usuarios
-                </h5>
-                <p class="card-text small">
-                    Gestión de usuarios, roles y permisos del sistema.
-                </p>
-                <a href="/admin/cuentas/usuario/" class="btn btn-primary btn-sm">Ir a administración</a>
-                <a href="{% url 'usuarios_list' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-people"></i> Gestión de usuarios</a>
+    <h2 class="mb-4">Panel Administrador</h2>
 
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Usuarios</h6>
+                    <p class="fs-3 mb-1">{{ total_usuarios|default:"-" }}</p>
+                    <a href="{% url 'usuarios_list' %}" class="stretched-link small">
+                        Gestionar usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Clientes</h6>
+                    <p class="fs-3 mb-1">{{ total_clientes|default:"-" }}</p>
+                    <span class="small text-muted">Módulo clientes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Sensores activos</h6>
+                    <p class="fs-3 mb-1">{{ sensores_activos|default:"-" }}</p>
+                    <span class="small text-muted">Resumen IoT</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Alertas abiertas</h6>
+                    <p class="fs-3 mb-1 text-danger">{{ alertas_abiertas|default:"-" }}</p>
+                    <span class="small text-muted">Revisar módulo sensores</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-server"></i> Planta & Sensores
-                </h5>
-                <p class="card-text small">
-                    Configuración de estanques, sensores y actuadores.
-                </p>
-                <a href="{% url 'dashboard_planta' %}" class="btn btn-primary btn-sm">Ver dashboard</a>
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold">
+            Atajos rápidos
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <a href="{% url 'usuarios_list' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-people"></i> Usuarios
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#" class="btn btn-outline-primary w-100">
+                        Sensores
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#" class="btn btn-outline-primary w-100">
+                        Reportes
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#" class="btn btn-outline-primary w-100">
+                        Auditoría
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-clipboard-data"></i> Reportes
-                </h5>
-                <p class="card-text small">
-                    Acceso a reportes de producción, ventas y alertas.
-                </p>
-                <a href="#" class="btn btn-outline-primary btn-sm disabled">En construcción</a>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}

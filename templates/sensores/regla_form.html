@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Regla de control{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    {% if object %}Editar regla{% else %}Nueva regla{% endif %}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'reglas_list' %}" class="btn btn-outline-secondary">
+                                Volver
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

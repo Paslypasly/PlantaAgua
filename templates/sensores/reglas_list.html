@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Reglas de control{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Reglas de control</h2>
+
+        {% if user.rol == "OPERARIO" or user.is_superuser %}
+            <a href="{% url 'regla_create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i> Nueva regla
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Sensor</th>
+                            <th>Actuador</th>
+                            <th>Condición</th>
+                            <th>Prioridad</th>
+                            <th>Activo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reglas %}
+                            <tr>
+                                <td>{{ r.nombre }}</td>
+                                <td>{{ r.sensor.nombre }}</td>
+                                <td>{{ r.actuador.nombre }}</td>
+                                <td>{{ r.condicion }}</td>
+                                <td>{{ r.prioridad }}</td>
+                                <td>
+                                    {% if r.activo %}
+                                        <span class="badge bg-success">Sí</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if user.rol == "OPERARIO" or user.is_superuser %}
+                                        <a href="{% url 'regla_update' r.pk %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Editar
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-3">
+                                    No hay reglas de control definidas.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

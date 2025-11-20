@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Planta & Sensores{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+    <h2 class="mb-4">Dashboard Planta & Sensores</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Sensores registrados</h6>
+                    <p class="fs-1 mb-0">{{ total_sensores }}</p>
+                    <span class="text-muted small">Incluye nivel, contador e incluso pH (desactivado).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Sensores activos</h6>
+                    <p class="fs-1 mb-0 text-success">{{ sensores_activos }}</p>
+                    <span class="text-muted small">Reportando datos al sistema.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Alertas abiertas</h6>
+                    <p class="fs-1 mb-0 text-danger">{{ alertas_abiertas }}</p>
+                    <span class="text-muted small">Revisar módulo de alertas.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header fw-semibold">
+                    Últimas lecturas de sensores
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Sensor</th>
+                                    <th>Valor</th>
+                                    <th>Unidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lec in ultimas_lecturas %}
+                                    <tr>
+                                        <td>{{ lec.fecha_hora|date:"d-m-Y H:i:s" }}</td>
+                                        <td>{{ lec.sensor.nombre }}</td>
+                                        <td>{{ lec.valor }}</td>
+                                        <td>{{ lec.unidad }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">
+                                            Todavía no hay lecturas registradas.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-semibold">
+                    Estado general
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Este panel resume el estado de los sensores de nivel, contador y pH
+                        (aunque el pH esté desactivado a nivel de hardware, ya está listo a nivel de software).
+                    </p>
+                    <ul class="mb-0">
+                        <li>Operario: controla nivel de estanques y revisa alertas.</li>
+                        <li>Gerente: observa KPIs de producción y fallas.</li>
+                        <li>Todas las acciones quedan registradas para auditoría.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

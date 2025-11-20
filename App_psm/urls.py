@@ -30,6 +30,11 @@ urlpatterns = [
     path("ventas/", include("ventas.urls")),
     path("logistica/", include("logistica.urls")),
     path("reportes/", include("reportes.urls")),
+    path("produccion/", include("produccion.urls")),
 
 
 ]
+
+handler403 = "core.views.error_403_view"
+handler404 = "core.views.error_404_view"
+handler500 = "core.views.error_500_view"

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Eventos de Planta · Planta San Miguel{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">
+    <i class="bi bi-activity"></i> Eventos de Planta
+</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha / hora</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Estanque</th>
+                    <th>Severidad</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in eventos %}
+                <tr>
+                    <td>{{ e.fecha_hora|date:"d-m-Y H:i" }}</td>
+                    <td>{{ e.tipo|default:"-" }}</td>
+                    <td>{{ e.descripcion|default:"-" }}</td>
+                    <td>{{ e.estanque.nombre|default:"-" }}</td>
+                    <td>
+                        <span class="badge
+                            {% if e.severidad == 'ALTA' %}bg-danger
+                            {% elif e.severidad == 'MEDIA' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ e.severidad|default:"-" }}
+                        </span>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3">
+                        No hay eventos registrados.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
