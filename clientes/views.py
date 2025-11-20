@@ -4,6 +4,17 @@ from django.urls import reverse_lazy
 from core.mixins import RolRequiredMixin
 from .models import Cliente
 
+# clientes/views.py
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from .models import Cliente
+from .forms import ClienteForm
+
+class RegistroClienteView(CreateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = "clientes/registro_cliente.html"
+    success_url = reverse_lazy("home")  # o a una página de "gracias"
 
 class ClienteListView(RolRequiredMixin, ListView):
     model = Cliente

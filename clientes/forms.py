@@ -21,6 +21,7 @@ class ClienteForm(forms.ModelForm):
             "telefono",
             "sector_entrega",
             "activo",
+            
         ]
 
     def clean_rut_numero(self):

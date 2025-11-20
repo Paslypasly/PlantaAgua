@@ -10,14 +10,16 @@ class Usuario(AbstractUser):
     El DV se calcula automáticamente a partir del rut_numero.
     """
 
-    ROL_CHOICES = [
-        ("ADMIN", "Administrador"),
-        ("OPERARIO", "Operario"),
-        ("CONDUCTOR", "Conductor"),
-        ("GERENTE", "Gerente"),
-        ("TECNICO", "Técnico"),
-        ("AUDITOR", "Auditor"),
-    ]
+    class Rol(models.TextChoices):
+        ADMIN = "ADMIN", "Administrador"
+        OPERARIO = "OPERARIO", "Operario"
+        CONDUCTOR = "CONDUCTOR", "Conductor"
+        GERENTE = "GERENTE", "Gerente"
+        TECNICO = "TECNICO", "Técnico"
+        AUDITOR = "AUDITOR", "Auditor"
+
+    # Mantengo ROL_CHOICES por si lo usas en otros lados
+    ROL_CHOICES = Rol.choices
 
     rut_numero = models.CharField(
         max_length=8,
@@ -35,7 +37,7 @@ class Usuario(AbstractUser):
     rol = models.CharField(
         max_length=20,
         choices=ROL_CHOICES,
-        default="OPERARIO"
+        default=Rol.OPERARIO,
     )
 
     def get_rut_completo(self) -> str:
