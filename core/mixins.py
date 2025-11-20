@@ -5,19 +5,24 @@ from django.core.exceptions import PermissionDenied
 
 class RolRequiredMixin(LoginRequiredMixin):
     """
-    Mixin para vistas basadas en clases que valida que el usuario
-    tenga alguno de los roles permitidos.
-    Uso:
-        class MiVista(RolRequiredMixin, ListView):
-            roles_permitidos = ["ADMIN", "GERENTE"]
+    Mixin para vistas que requieren que el usuario tenga cierto rol.
+    - Si no está autenticado -> redirige a login.
+    - Si es superuser -> siempre pasa.
+    - Si su rol no está en roles_permitidos -> 403.
     """
-    roles_permitidos: list[str] = []
+    roles_permitidos = []
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        user = request.user
+
+        if not user.is_authenticated:
             return self.handle_no_permission()
 
-        if self.roles_permitidos and request.user.rol not in self.roles_permitidos:
-            raise PermissionDenied("No tiene permisos para acceder a esta vista.")
+        # superusuario siempre puede entrar
+        if user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+
+        if self.roles_permitidos and user.rol not in self.roles_permitidos:
+            raise PermissionDenied("No tienes permiso para ver esta vista.")
 
         return super().dispatch(request, *args, **kwargs)

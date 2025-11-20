@@ -1,0 +1,63 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-semibold" href="{% url 'home' %}">
+            Planta San Miguel
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                {% if user.is_authenticated %}
+                    {% if user.rol == "ADMIN" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_admin' %}">Panel Admin</a>
+                        </li>
+                    {% elif user.rol == "OPERARIO" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_operario' %}">Panel Operario</a>
+                        </li>
+                    {% elif user.rol == "CONDUCTOR" %}
+                        <li class="nav-link nav-item" href="{% url 'panel_conductor' %}">Panel Conductor</a>
+                        </li>
+                    {% elif user.rol == "GERENTE" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_gerente' %}">Panel Gerente</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard_planta' %}">
+                            Planta / Sensores
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin Django</a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            {{ user.get_full_name|default:user.username }} ({{ user.get_rol_display }})
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Salir</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Ingresar</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

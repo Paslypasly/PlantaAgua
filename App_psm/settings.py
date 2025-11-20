@@ -145,3 +145,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = "cuentas.Usuario"
+LOGIN_REDIRECT_URL = "redirigir_por_rol"

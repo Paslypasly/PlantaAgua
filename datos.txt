@@ -24,3 +24,6 @@ python manage.py startapp auditoria
 python manage.py startapp notificaciones
 
 python manage.py shell <--- comando para entrar en el shell para hacer pruebas
+
+superuser: paula
+pd: 1234

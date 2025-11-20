@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h3 mb-3">Planta Purificadora San Miguel</h1>
+                <p class="lead">
+                    Sistema de gestión e IoT para monitorear la planta, sensores y procesos
+                    de distribución de agua purificada.
+                </p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'panel_por_rol' %}" class="btn btn-primary">
+                        Ir a mi panel
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        Iniciar sesión
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Panel Gerente{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Panel Gerente</h1>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-speedometer2"></i> KPI Operacionales
+                </h5>
+                <p class="card-text small">
+                    Acceso rápido a estado de planta y alertas críticas.
+                </p>
+                <a href="{% url 'dashboard_planta' %}" class="btn btn-primary btn-sm">Ver dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart"></i> Reportes de negocio
+                </h5>
+                <p class="card-text small">
+                    Enlazar con reportes de ventas, clientes y producción.
+                </p>
+                <a href="#" class="btn btn-outline-primary btn-sm disabled">En construcción</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Panel Operario{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Panel Operario</h1>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-water"></i> Estado de Planta
+                </h5>
+                <p class="card-text small">
+                    Niveles de estanques, bomba y alertas activas.
+                </p>
+                <a href="{% url 'dashboard_planta' %}" class="btn btn-primary btn-sm">Abrir dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-exclamation-triangle"></i> Alertas
+                </h5>
+                <p class="card-text small">
+                    Revisar y atender alertas críticas de sensores.
+                </p>
+                <a href="#" class="btn btn-outline-primary btn-sm disabled">En construcción</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
