@@ -2,48 +2,86 @@
 {% block title %}Contacto - Planta San Miguel{% endblock %}
 
 {% block content %}
+<h1 class="h3 mb-3">Contacto</h1>
 
-<div class="container my-5">
+<div class="row g-4">
+    <!-- Formulario -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-2">
+                    <i class="bi bi-chat-dots me-1 text-primary"></i>
+                    Envíanos un mensaje
+                </h2>
+                <p class="small text-muted mb-3">
+                    Completa el siguiente formulario y nuestro equipo se pondrá en contacto contigo.
+                </p>
 
-    <div class="text-center mb-4">
-        <h1 class="fw-bold">Formulario de Contacto</h1>
-        <p class="lead">Envíanos tus consultas o sugerencias.</p>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-
-            <div class="card shadow-sm p-4">
-
-                <form method="post">
+                <form method="post" novalidate>
                     {% csrf_token %}
+                    {{ form.non_field_errors }}
 
                     <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input type="text" class="form-control" placeholder="Tu nombre completo">
+                        <label class="form-label fw-semibold">{{ form.nombre.label }}</label>
+                        {{ form.nombre }}
+                        <div class="text-danger small">{{ form.nombre.errors }}</div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Correo</label>
-                        <input type="email" class="form-control" placeholder="email@ejemplo.com">
+                        <label class="form-label fw-semibold">{{ form.correo.label }}</label>
+                        {{ form.correo }}
+                        <div class="text-danger small">{{ form.correo.errors }}</div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Mensaje</label>
-                        <textarea class="form-control" rows="5" placeholder="Escribe tu mensaje aquí"></textarea>
+                        <label class="form-label fw-semibold">{{ form.telefono.label }}</label>
+                        {{ form.telefono }}
+                        <div class="text-danger small">{{ form.telefono.errors }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.mensaje.label }}</label>
+                        {{ form.mensaje }}
+                        <div class="text-danger small">{{ form.mensaje.errors }}</div>
                     </div>
 
                     <button class="btn btn-primary" type="submit">
                         Enviar mensaje
                     </button>
-
                 </form>
-
             </div>
-
         </div>
     </div>
 
-</div>
+    <!-- Información de contacto / lado derecho -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h2 class="h6 text-uppercase text-muted mb-3">Información de contacto</h2>
 
+                <p class="mb-2">
+                    <i class="bi bi-telephone text-primary me-2"></i>
+                    <strong>Teléfono:</strong> +56 9 1234 5678
+                </p>
+                <p class="mb-2">
+                    <i class="bi bi-envelope text-primary me-2"></i>
+                    <strong>Correo:</strong> contacto@plantasanmiguel.cl
+                </p>
+                <p class="mb-2">
+                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                    <strong>Dirección:</strong> Planta San Miguel, Región de Antofagasta
+                </p>
+
+                <hr>
+
+                <p class="small text-muted mb-1">
+                    Horario de atención:
+                </p>
+                <p class="small mb-0">
+                    Lunes a sábado, 09:00 a 19:00 hrs.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
