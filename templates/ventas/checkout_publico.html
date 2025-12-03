@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-4">Confirmación de pedido</h1>
+
+{% if not items %}
+<div class="alert alert-warning">
+    Tu carrito está vacío. Ve al
+    <a href="{% url 'productos:catalogo_publico' %}">catálogo</a>
+    para agregar productos.
+</div>
+{% else %}
+<div class="row g-4">
+    <!-- Resumen del carrito -->
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                Resumen de tu pedido
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-center">Cant.</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.producto.nombre }}</td>
+                            <td class="text-center">{{ item.cantidad }}</td>
+                            <td class="text-end">$ {{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="text-end">Total</th>
+                            <th class="text-end">$ {{ total }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de datos del cliente -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                Tus datos de contacto
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            {{ form.nombre.label_tag }}
+                            {{ form.nombre }}
+                            {{ form.nombre.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.correo.label_tag }}
+                            {{ form.correo }}
+                            {{ form.correo.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.telefono.label_tag }}
+                            {{ form.telefono }}
+                            {{ form.telefono.errors }}
+                        </div>
+
+                        <div class="col-md-12">
+                            {{ form.direccion.label_tag }}
+                            {{ form.direccion }}
+                            {{ form.direccion.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.sector_entrega.label_tag }}
+                            {{ form.sector_entrega }}
+                            {{ form.sector_entrega.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.rut_numero.label_tag }}
+                            {{ form.rut_numero }}
+                            <small class="form-text text-muted">
+                                {{ form.rut_numero.help_text }}
+                            </small>
+                            {{ form.rut_numero.errors }}
+                        </div>
+
+                        <div class="col-md-12">
+                            {{ form.comentarios.label_tag }}
+                            {{ form.comentarios }}
+                            {{ form.comentarios.errors }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'ventas:carrito' %}" class="btn btn-outline-secondary">
+                            Volver al carrito
+                        </a>
+                        <button class="btn btn-primary" type="submit">
+                            Confirmar pedido
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,16 +1,9 @@
-# productos/urls.py
 from django.urls import path
-from . import views
+from .views import CatalogoPublicoView, ProductoDetallePublicoView
+
+app_name = "productos"
 
 urlpatterns = [
-    path(
-        "catalogo/",
-        views.CatalogoPublicoView.as_view(),
-        name="catalogo_publico",
-    ),
-    path(
-        "catalogo/<int:pk>/",
-        views.ProductoDetallePublicoView.as_view(),
-        name="detalle_producto_publico",
-    ),
+    path("catalogo/", CatalogoPublicoView.as_view(), name="catalogo_publico"),
+    path("detalle/<int:pk>/", ProductoDetallePublicoView.as_view(), name="detalle_publico"),
 ]

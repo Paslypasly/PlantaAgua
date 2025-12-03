@@ -21,8 +21,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
 
-        <!-- Branding -->
-        <a class="navbar-brand fw-semibold" href="/">
+        <!-- Branding: lleva al home público -->
+        <a class="navbar-brand fw-semibold" href="{% url 'pages:home' %}">
             Planta San Miguel
         </a>
 
@@ -36,14 +36,43 @@
             <!-- ========== MENÚ IZQUIERDO ========== -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                <!-- Catálogo siempre visible -->
+                <!-- Sitio público (siempre visible) -->
                 <li class="nav-item">
-                    <a href="{% url 'catalogo_publico' %}">Catálogo</a>
+                    <a class="nav-link" href="{% url 'pages:home' %}">
+                        <i class="bi bi-house"></i> Inicio
+                    </a>
+                </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'productos:catalogo_publico' %}">
+                        <i class="bi bi-bag"></i> Catálogo
+                    </a>
+                </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'ventas:carrito' %}">
+                        <i class="bi bi-cart"></i> Carrito
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pages:ayuda' %}">
+                        Ayuda
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pages:contacto' %}">
+                        Contacto
+                    </a>
                 </li>
 
                 {% if user.is_authenticated %}
+
+                    <!-- Separador visual -->
+                    <li class="nav-item">
+                        <span class="nav-link disabled">|</span>
+                    </li>
 
                     <!-- Panel según rol -->
                     {% if user.rol == "ADMIN" %}
@@ -82,7 +111,7 @@
                         </a>
                     </li>
 
-                    <!-- Producción (plan_produccion_diaria) -->
+                    <!-- Producción -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'plan_produccion_diaria' %}">
                             <i class="bi bi-box"></i> Producción
