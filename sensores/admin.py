@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TipoSensor, Sensor, LecturaSensor, Actuador, Alerta, ReglaControl
+from .models import TipoSensor, Sensor, LecturaSensor, Actuador, Alerta, ReglaControl, LecturaCrudaESP32
 
 
 @admin.register(TipoSensor)
@@ -33,3 +33,8 @@ class AlertaAdmin(admin.ModelAdmin):
 @admin.register(ReglaControl)
 class ReglaControlAdmin(admin.ModelAdmin):
     list_display = ("nombre", "sensor", "condicion", "umbral", "actuador")
+
+@admin.register(LecturaCrudaESP32)
+class LecturaCrudaESP32Admin(admin.ModelAdmin):
+    list_display = ("sensor_id", "nivel_cm", "ir_estado", "ph", "timestamp")
+    list_filter = ("sensor_id", "timestamp")

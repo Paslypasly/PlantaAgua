@@ -23,9 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ivw(3)eg$9sn-$(51%5*fdmqrl!o$rl@+ufg^p#zmz%zbsc3ug'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# App_psm/settings.py
+
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "192.168.56.1",
+]
 
 
 # Application definition
@@ -53,6 +59,7 @@ INSTALLED_APPS = [
     'reportes',
     'auditoria',
     'notificaciones',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +159,7 @@ LOGOUT_REDIRECT_URL = "home"
 
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# App_psm/settings.py
+
+SENSORES_API_TOKEN = "TOKEN_SUPER_SECRETO"  # hay que cambiarlo

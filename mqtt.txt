@@ -1,0 +1,37 @@
+✔ MODO 1 — Usar Mosquitto en tu HP (broker local)
+
+Este modo es para cuando estás desarrollando, probando el ESP32 en tu casa, y NO tienes la mini-PC cerca.
+
+PASO 1: Ubica Mosquitto
+
+Ya lo encontraste:
+
+C:\Program Files\mosquitto\
+
+PASO 2: Arranca el broker (ya estaba activo)
+
+Compruébalo:
+
+netstat -ano | find "1883"
+tasklist | find "mosquitto"
+
+
+Si sale → LISTENING → todo bien.
+
+PASO 3: Suscribirte
+
+En CMD:
+
+cd "C:\Program Files\mosquitto"
+mosquitto_sub.exe -h 192.168.1.152 -t test/topic
+
+PASO 4: Publicar mensajes
+
+En otro CMD:
+
+cd "C:\Program Files\mosquitto"
+mosquitto_pub.exe -h 192.168.1.152 -t test/topic -m "hola desde HP"
+
+PASO 5: ESP32 apuntando al HP
+const char* mqtt_server = "192.168.1.152";
+const int mqtt_port = 1883;

@@ -1,0 +1,168 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <NewPing.h>
+
+// ================== CONFIG WIFI ==================
+const char* ssid     = "Pepa 40";
+const char* password = "miguel*pepa#";
+
+// ================== CONFIG MQTT ==================
+const char* mqtt_server = "192.168.1.152";   // IP de tu PC con Mosquitto
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+// ================== PINES SENSORES ==================
+// Ultrasonido HC-SR04
+const int TRIG_PIN = 5;
+const int ECHO_PIN = 18;
+#define MAX_DIST_CM 300
+NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DIST_CM);
+
+// Sensor IR (detección de bidón)
+const int IR_PIN = 19;
+
+// Sensor de pH (solo lectura cruda por ahora)
+const int PH_PIN = 34;
+
+// ================== FUNCIONES WIFI ==================
+
+void setup_wifi() {
+  Serial.println("Conectando a WiFi...");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\nWiFi CONECTADO!");
+  Serial.print("IP ESP32: ");
+  Serial.println(WiFi.localIP());
+}
+
+// ================== CALLBACK MQTT ==================
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  // Por ahora solo mostramos lo que llegue, pero no actuamos
+  Serial.print("MQTT recibido [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  for (unsigned int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+// ================== RECONEXIÓN MQTT ==================
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.println("Intentando conectar a MQTT...");
+    if (client.connect("ESP32_Planta_SanMiguel")) {
+      Serial.println("MQTT CONECTADO!");
+      // Si más adelante quieres comandos:
+      // client.subscribe("planta/control/#");
+    } else {
+      Serial.print("Fallo MQTT, rc=");
+      Serial.println(client.state());
+      Serial.println("Reintentando en 2 segundos...");
+      delay(2000);
+    }
+  }
+}
+
+// ================== SETUP ==================
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  pinMode(IR_PIN, INPUT);     // si el IR requiere pull-up, cambiar a INPUT_PULLUP
+  pinMode(PH_PIN, INPUT);
+
+  setup_wifi();
+
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
+// ================== LOOP ==================
+
+void loop() {
+  // Mantener conexión MQTT
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  // ===== 1. Lectura ultrasonido =====
+  unsigned int distancia = sonar.ping_cm();
+  if (distancia == 0) {
+    distancia = MAX_DIST_CM; // fuera de rango
+  }
+
+  // ==== Calibración tanque (altura 10 cm) ====
+  // Distancia desde el sensor al FONDO del tanque (tanque vacío)
+  const float DISTANCIA_VACIO_CM = 10.0;  // AJUSTA si tu medición real cambia
+
+  // Distancia desde sensor al NIVEL DE AGUA cuando consideras "lleno"
+  const float DISTANCIA_LLENO_CM = 3.0;   // AJUSTA con tu medición real
+
+  // Limitar la distancia medida al rango [lleno, vacío]
+  float d = distancia;
+  if (d < DISTANCIA_LLENO_CM) d = DISTANCIA_LLENO_CM;
+  if (d > DISTANCIA_VACIO_CM) d = DISTANCIA_VACIO_CM;
+
+  // Altura útil de agua (desde fondo hasta nivel de "lleno")
+  float altura_tanque_cm = DISTANCIA_VACIO_CM - DISTANCIA_LLENO_CM;
+
+  // Nivel de agua medido (cuánto está "relleno")
+  float nivel_cm = DISTANCIA_VACIO_CM - d;   // cuánto se ha llenado desde el fondo
+  if (nivel_cm < 0) nivel_cm = 0;
+  if (nivel_cm > altura_tanque_cm) nivel_cm = altura_tanque_cm;
+
+  // Nivel en porcentaje
+  int nivel_pct = 0;
+  if (altura_tanque_cm > 0) {
+    nivel_pct = (int)((nivel_cm / altura_tanque_cm) * 100.0);
+  }
+
+  // Clasificación del nivel
+  String estado_nivel;
+  if (nivel_pct >= 80) {
+    estado_nivel = "ALTO";
+  } else if (nivel_pct >= 40) {
+    estado_nivel = "NORMAL";
+  } else if (nivel_pct >= 20) {
+    estado_nivel = "BAJO";
+  } else {
+    estado_nivel = "CRITICO";
+  }
+
+  // ===== 2. Lectura IR =====
+  int ir_value = digitalRead(IR_PIN);
+  // Más adelante definimos si 0 = bidón presente o 1 = presente según tu módulo
+
+  // ===== 3. Lectura pH crudo =====
+  int ph_raw = analogRead(PH_PIN);
+
+  // ===== 4. Construir JSON =====
+  String json = "{";
+  json += "\"distancia_cm\": " + String(distancia) + ",";   // distancia directa del sensor
+  json += "\"nivel_cm\": " + String(nivel_cm, 1) + ",";     // cm de agua útiles
+  json += "\"nivel_pct\": " + String(nivel_pct) + ",";      // porcentaje 0–100
+  json += "\"estado_nivel\": \"" + estado_nivel + "\",";    // ALTO/NORMAL/BAJO/CRITICO
+  json += "\"ir\": " + String(ir_value) + ",";              // valor digital del IR
+  json += "\"ph_raw\": " + String(ph_raw);                  // lectura analógica cruda
+  json += "}";
+
+  Serial.println("Publicando: " + json);
+
+  bool ok = client.publish("planta/datos", json.c_str());
+  Serial.print("Resultado publish: ");
+  Serial.println(ok ? "OK" : "FAIL");
+
+  delay(2000);  // cada 2 segundos
+}

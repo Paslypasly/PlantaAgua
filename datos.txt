@@ -4,7 +4,8 @@ venv\Scripts\activate
 python.exe -m pip install --upgrade pip
 pip install django psycopg2-binary djangorestframework paho-mqtt python-dotenv  asyncio-mqtt
 
-imstalar mqtt en windows
+imstalar mqtt en windows = pip install paho-mqtt
+
 
 django-admin startproject planta_san_miguel .
 python manage.py startapp core

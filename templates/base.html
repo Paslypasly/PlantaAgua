@@ -22,7 +22,7 @@
     <div class="container-fluid">
 
         <!-- Branding -->
-        <a class="navbar-brand fw-semibold" href="{% url 'home' %}">
+        <a class="navbar-brand fw-semibold" href="/">
             Planta San Miguel
         </a>
 
@@ -35,6 +35,13 @@
 
             <!-- ========== MENÚ IZQUIERDO ========== -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <!-- Catálogo siempre visible -->
+                <li class="nav-item">
+                    <a href="{% url 'catalogo_publico' %}">Catálogo</a>
+
+
+                </li>
 
                 {% if user.is_authenticated %}
 
@@ -68,10 +75,10 @@
                         </li>
                     {% endif %}
 
-                    <!-- Planta & Sensores (usa la vista REAL que tienes) -->
+                    <!-- Planta & Sensores -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'estado_estanques' %}">
-                            <i class="bi bi-water"></i> Planta & Sensores
+                            <i class="bi bi-water"></i> Planta &amp; Sensores
                         </a>
                     </li>
 
@@ -150,7 +157,7 @@
 <!-- ========================= FOOTER ========================= -->
 <footer class="bg-dark text-light py-3 mt-auto">
     <div class="container text-center small">
-        Planta Purificadora San Miguel · Sistema IoT & Gestión · {{ now|date:"Y" }}
+        Planta Purificadora San Miguel · Sistema IoT &amp; Gestión · {% now "Y" %}
     </div>
 </footer>
 

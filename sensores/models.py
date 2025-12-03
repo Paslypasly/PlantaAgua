@@ -64,7 +64,7 @@ class Sensor(BaseModel):
 
 
 # ======================================================
-#   LECTURAS
+#   LECTURAS NORMALIZADAS (por sensor)
 # ======================================================
 class LecturaSensor(BaseModel):
     sensor = models.ForeignKey(
@@ -149,3 +149,31 @@ class ReglaControl(BaseModel):
 
     def __str__(self):
         return f"{self.nombre} ({self.sensor.codigo})"
+
+
+# ======================================================
+#   LECTURA CRUDA DESDE ESP32 (JSON del prompt)
+# ======================================================
+class LecturaCrudaESP32(BaseModel):
+    """
+    Guarda el JSON EXACTO que envía el ESP32:
+    {
+      "token": "...",
+      "sensor_id": "tanque_1",
+      "nivel_cm": 118.55,
+      "ir_estado": 0,
+      "ph": null
+    }
+    Solo se persisten los campos técnicos, sin el token.
+    """
+    sensor_id = models.CharField(max_length=100)
+    nivel_cm = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ir_estado = models.IntegerField(null=True, blank=True)
+    ph = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ("-timestamp",)
+
+    def __str__(self):
+        return f"{self.sensor_id} @ {self.timestamp:%Y-%m-%d %H:%M:%S}"

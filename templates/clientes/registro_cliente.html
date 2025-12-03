@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de cliente{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1>Registro de cliente</h1>
+
+    <div class="alert alert-info">
+        En la versión actual del sistema, <strong>no es obligatorio crear una cuenta</strong>
+        para realizar pedidos. Los clientes pueden comprar usando el carrito
+        y completando sus datos en el formulario de checkout.
+    </div>
+
+    <p>
+        Si eres un cliente frecuente o un cliente corporativo, tu registro se gestiona
+        internamente por el equipo de la Planta Purificadora San Miguel.
+        Por favor, contacta a un administrador para más información.
+    </p>
+
+    <a href="{% url 'productos:catalogo_publico' %}" class="btn btn-primary mt-3">
+        Ir al catálogo de productos
+    </a>
+</div>
+{% endblock %}
