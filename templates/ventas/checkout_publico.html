@@ -1,115 +1,158 @@
 {% extends "base.html" %}
-{% block title %}Checkout{% endblock %}
+{% block title %}Checkout - Datos de entrega{% endblock %}
+
+{# ========= CSS extra: Leaflet + estilo del mapa ========= #}
+{% block extra_css %}
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+    #map-direccion {
+        height: 300px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1 class="h4 mb-4">Confirmación de pedido</h1>
 
-{% if not items %}
-<div class="alert alert-warning">
-    Tu carrito está vacío. Ve al
-    <a href="{% url 'productos:catalogo_publico' %}">catálogo</a>
-    para agregar productos.
-</div>
-{% else %}
-<div class="row g-4">
-    <!-- Resumen del carrito -->
-    <div class="col-lg-5">
-        <div class="card">
-            <div class="card-header">
-                Resumen de tu pedido
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th class="text-center">Cant.</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td>{{ item.producto.nombre }}</td>
-                            <td class="text-center">{{ item.cantidad }}</td>
-                            <td class="text-end">$ {{ item.subtotal }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="2" class="text-end">Total</th>
-                            <th class="text-end">$ {{ total }}</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+<!-- Indicador de pasos -->
+<div class="mb-4">
+    <div class="d-flex justify-content-center align-items-center gap-3 small text-muted">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-pill bg-primary">1</span>
+            <span>Carrito</span>
+        </div>
+        <div class="flex-grow-1 border-top" style="max-width: 80px;"></div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-pill bg-primary">2</span>
+            <span>Datos de entrega</span>
+        </div>
+        <div class="flex-grow-1 border-top" style="max-width: 80px;"></div>
+        <div class="d-flex align-items-center gap-2 text-muted">
+            <span class="badge rounded-pill bg-secondary">3</span>
+            <span>Confirmación</span>
         </div>
     </div>
+</div>
 
-    <!-- Formulario de datos del cliente -->
+<h1 class="h3 mb-3">Confirmar pedido</h1>
+
+{% if items %}
+<div class="row g-4">
+
+    <!-- Columna izquierda: formulario -->
     <div class="col-lg-7">
-        <div class="card">
-            <div class="card-header">
-                Tus datos de contacto
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h2 class="h5 mb-1">
+                    <i class="bi bi-person-lines-fill me-1 text-primary"></i>
+                    Datos de entrega
+                </h2>
+                <p class="small text-muted mb-2">
+                    Completa la información para coordinar la entrega de tu pedido.
+                </p>
             </div>
-            <div class="card-body">
-                <form method="post">
+            <div class="card-body pt-3">
+                <form method="post" novalidate>
                     {% csrf_token %}
                     {{ form.non_field_errors }}
 
                     <div class="row g-3">
-                        <div class="col-md-12">
-                            {{ form.nombre.label_tag }}
+                        <!-- Nombre -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.nombre.label }}</label>
                             {{ form.nombre }}
-                            {{ form.nombre.errors }}
+                            <div class="text-danger small">{{ form.nombre.errors }}</div>
                         </div>
 
+                        <!-- Correo con icono -->
                         <div class="col-md-6">
-                            {{ form.correo.label_tag }}
-                            {{ form.correo }}
-                            {{ form.correo.errors }}
+                            <label class="form-label fw-semibold">{{ form.correo.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.correo }}
+                            </div>
+                            <div class="text-danger small">{{ form.correo.errors }}</div>
                         </div>
 
+                        <!-- Teléfono con icono -->
                         <div class="col-md-6">
-                            {{ form.telefono.label_tag }}
-                            {{ form.telefono }}
-                            {{ form.telefono.errors }}
+                            <label class="form-label fw-semibold">{{ form.telefono.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                {{ form.telefono }}
+                            </div>
+                            <div class="form-text small">
+                                Ejemplo: +56 9 1234 5678
+                            </div>
+                            <div class="text-danger small">{{ form.telefono.errors }}</div>
                         </div>
 
-                        <div class="col-md-12">
-                            {{ form.direccion.label_tag }}
-                            {{ form.direccion }}
-                            {{ form.direccion.errors }}
-                        </div>
-
+                        <!-- Sector -->
                         <div class="col-md-6">
-                            {{ form.sector_entrega.label_tag }}
+                            <label class="form-label fw-semibold">{{ form.sector_entrega.label }}</label>
                             {{ form.sector_entrega }}
-                            {{ form.sector_entrega.errors }}
+                            <div class="text-danger small">{{ form.sector_entrega.errors }}</div>
                         </div>
 
+                        <!-- Dirección + MAPA -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.direccion.label }}</label>
+                            {{ form.direccion }}
+                            <div class="form-text small mb-2">
+                                Puedes escribir la dirección manualmente o hacer clic en el mapa para rellenarla automáticamente.
+                            </div>
+                            <div id="map-direccion" class="mt-1"></div>
+                            <div class="text-danger small">{{ form.direccion.errors }}</div>
+                        </div>
+
+                        <!-- RUT -->
                         <div class="col-md-6">
-                            {{ form.rut_numero.label_tag }}
+                            <label class="form-label fw-semibold">{{ form.rut_numero.label }}</label>
                             {{ form.rut_numero }}
-                            <small class="form-text text-muted">
+                            <div class="form-text small">
                                 {{ form.rut_numero.help_text }}
-                            </small>
-                            {{ form.rut_numero.errors }}
+                            </div>
+                            <div class="text-danger small">{{ form.rut_numero.errors }}</div>
                         </div>
 
-                        <div class="col-md-12">
-                            {{ form.comentarios.label_tag }}
+                        <!-- Forma de pago -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold d-block">{{ form.forma_pago.label }}</label>
+                            <div class="d-flex flex-column gap-1 border rounded p-2">
+                                {% for radio in form.forma_pago %}
+                                <div class="form-check mb-0">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-danger small">{{ form.forma_pago.errors }}</div>
+                            <div class="form-text small mt-1">
+                                El pago se realiza al momento de la entrega.
+                            </div>
+                        </div>
+
+                        <!-- Comentarios -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.comentarios.label }}</label>
                             {{ form.comentarios }}
-                            {{ form.comentarios.errors }}
+                            <div class="text-danger small">{{ form.comentarios.errors }}</div>
                         </div>
                     </div>
 
-                    <div class="mt-4 d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mt-4">
                         <a href="{% url 'ventas:carrito' %}" class="btn btn-outline-secondary">
-                            Volver al carrito
+                            ← Volver al carrito
                         </a>
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-primary px-4" type="submit">
                             Confirmar pedido
                         </button>
                     </div>
@@ -117,6 +160,106 @@
             </div>
         </div>
     </div>
+
+    <!-- Columna derecha: resumen del pedido -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">
+                    <i class="bi bi-receipt-cutoff me-1"></i>
+                    Resumen del pedido
+                </h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush mb-3">
+                    {% for item in items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ item.producto.nombre }}</strong><br>
+                            <span class="small text-muted">
+                                {{ item.cantidad }} × $ {{ item.precio_unitario }}
+                                · {{ item.producto.presentacion_litros }} L
+                            </span>
+                        </div>
+                        <span class="fw-semibold">$ {{ item.subtotal }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="d-flex justify-content-between fw-bold mb-1">
+                    <span>Total a pagar:</span>
+                    <span>$ {{ total }}</span>
+                </div>
+                <p class="small text-muted mb-0 mt-1">
+                    El pago se realiza en <strong>efectivo</strong> o
+                    <strong>transferencia bancaria</strong> al momento de la entrega.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
+{% else %}
+<p class="text-muted">
+    Tu carrito está vacío. Ve al
+    <a href="{% url 'productos:catalogo_publico' %}">catálogo de productos</a>
+    para comenzar.
+</p>
 {% endif %}
+
+{% endblock %}
+
+{# ========= JS extra: Leaflet + lógica para rellenar dirección ========= #}
+{% block extra_js %}
+{{ block.super }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const mapElement = document.getElementById("map-direccion");
+    const direccionInput = document.getElementById("id_direccion");
+
+    if (!mapElement || !direccionInput) {
+        return;
+    }
+
+    // Centrar mapa en norte de Chile (ajusta si quieres otra ciudad)
+    const map = L.map('map-direccion').setView([-20.25, -70.13], 13); // Iquique aprox.
+
+    // Capa gratuita OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+
+    // Al hacer clic en el mapa: mover/crear marcador y buscar dirección
+    map.on('click', async function (e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept-Language': 'es'
+                }
+            });
+            const data = await response.json();
+
+            if (data && data.display_name) {
+                direccionInput.value = data.display_name;
+            }
+        } catch (err) {
+            console.error("Error al obtener dirección desde Nominatim:", err);
+        }
+    });
+});
+</script>
 {% endblock %}
