@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'auditoria.apps.AuditoriaConfig',
     'core',
     'pages',
     'cuentas',
@@ -57,9 +58,9 @@ INSTALLED_APPS = [
     'sensores',
     'logistica',
     'reportes',
-    'auditoria',
     'notificaciones',
     'rest_framework',
+    
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ventas.context_processors.cart_context',
+                'notificaciones.context_processors.notificaciones_no_leidas',
             ],
         },
     },

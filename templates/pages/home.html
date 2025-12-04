@@ -1,23 +1,185 @@
 {% extends "base.html" %}
 {% block title %}Inicio - Planta San Miguel{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ================== ESTILOS LANDING CLIENTE ================== */
+
+    .hero-landing {
+        background: radial-gradient(circle at top left, #cfe9ff 0, #ffffff 40%, #e1f8ff 80%);
+    }
+
+    .hero-badge {
+        border-radius: 999px;
+        background: rgba(13, 110, 253, 0.08);
+        color: #0d6efd;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .step-card {
+        border-top: 4px solid #0d6efd;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .step-1 { background-color: #0d6efd; color: #fff; }
+    .step-2 { background-color: #20c997; color: #fff; }
+    .step-3 { background-color: #ffc107; color: #212529; }
+
+    .fun-strip {
+        background: linear-gradient(90deg, #0d6efd, #20c997, #6610f2);
+        color: #fff;
+    }
+
+    .fun-strip i {
+        font-size: 1.3rem;
+    }
+
+    .product-highlight {
+        border-radius: 1rem;
+        border: 1px solid #e0e0e0;
+        background: linear-gradient(145deg, #ffffff, #f1f7ff);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<!-- HERO PRINCIPAL ORIENTADO A CLIENTE -->
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
-    <div class="container py-4 py-lg-5">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7 text-center text-lg-start">
+{% if user.is_authenticated %}
+    {# ================= HOME PARA USUARIOS INTERNOS ================= #}
+    <div class="mb-4">
+        <h1 class="h3 mb-2">Bienvenido(a), {{ user.username }}</h1>
+        <p class="text-muted mb-3">
+            Rol: {{ user.get_rol_display }} · Sistema de automatización y gestión de Planta Purificadora San Miguel.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-water me-1 text-primary"></i>
+                        Planta & Sensores
+                    </h5>
+                    <p class="card-text small text-muted">
+                        Monitorea niveles de estanques, estado de bombas y lecturas IoT en tiempo real.
+                    </p>
+                    <a href="{% url 'estado_estanques' %}" class="btn btn-primary btn-sm">
+                        Ir a Planta & Sensores
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-box-seam me-1 text-primary"></i>
+                        Producción
+                    </h5>
+                    <p class="card-text small text-muted">
+                        Revisa el plan de producción diaria, lotes y consumo de insumos.
+                    </p>
+                    <a href="{% url 'plan_produccion_diaria' %}" class="btn btn-primary btn-sm">
+                        Ir a Producción
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-speedometer2 me-1 text-primary"></i>
+                        Panel según rol
+                    </h5>
+                    <p class="card-text small text-muted">
+                        Accede a tu panel principal con indicadores y accesos rápidos según tu función.
+                    </p>
+                    {% if user.rol == "ADMIN" %}
+                        <a href="{% url 'panel_admin' %}" class="btn btn-primary btn-sm">
+                            Ir al Panel Admin
+                        </a>
+                    {% elif user.rol == "OPERARIO" or user.rol == "TECNICO" %}
+                        <a href="{% url 'panel_operario' %}" class="btn btn-primary btn-sm">
+                            Ir al Panel Operario
+                        </a>
+                    {% elif user.rol == "CONDUCTOR" %}
+                        <a href="{% url 'panel_conductor' %}" class="btn btn-primary btn-sm">
+                            Ir al Panel Conductor
+                        </a>
+                    {% elif user.rol == "GERENTE" or user.rol == "AUDITOR" %}
+                        <a href="{% url 'panel_gerente' %}" class="btn btn-primary btn-sm">
+                            Ir al Panel Gerente
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-outline-secondary btn-sm disabled">
+                            Panel no asignado
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <p class="small text-muted">
+        Nota: esta misma plataforma también expone un catálogo público y un flujo de pedidos para clientes externos,
+        aislado del módulo interno de operación y control IoT.
+    </p>
+
+{% else %}
+    {# ================= HOME PARA CLIENTE PÚBLICO (LANDING COLORIDA) ================= #}
+
+    <!-- Hero principal -->
+    <div class="p-5 mb-4 rounded-3 shadow-sm hero-landing">
+        <div class="row g-4 align-items-center">
+
+            <div class="col-md-7">
+                <div class="hero-badge mb-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-droplet-half"></i>
+                    <span>Agua purificada con monitoreo IoT en tiempo real</span>
+                </div>
+
                 <h1 class="display-5 fw-bold mb-3">
-                    Agua purificada a domicilio en tu sector
+                    Agua purificada a domicilio<br>
+                    <span class="text-primary">rápido, fácil y seguro</span>
                 </h1>
-                <p class="fs-5 text-muted mb-4">
-                    Planta Purificadora San Miguel entrega bidones de agua
-                    purificada con control de calidad y reparto programado.
-                    Haz tu pedido en pocos pasos y recibe en tu hogar o negocio.
+
+                <p class="fs-5 mb-3">
+                    Pide tus bidones de agua desde el sofá. Nosotros monitoreamos la planta con sensores IoT
+                    y tú solo decides cuánta agua necesitas y cuándo recibirla.
                 </p>
 
-                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-start">
+                <ul class="list-unstyled mb-3 small">
+                    <li class="mb-1">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        Agua purificada con control de calidad permanente.
+                    </li>
+                    <li class="mb-1">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        Reparto en sectores definidos de tu ciudad.
+                    </li>
+                    <li class="mb-1">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        Pago en efectivo o transferencia al recibir.
+                    </li>
+                </ul>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
                     <a href="{% url 'productos:catalogo_publico' %}" class="btn btn-primary btn-lg">
                         Ver catálogo y precios
                     </a>
@@ -27,136 +189,120 @@
                 </div>
 
                 <p class="small text-muted mt-3 mb-0">
-                    Horario de reparto: Lun–Sáb 09:00 a 19:00 ·
-                    Pago en efectivo o transferencia al momento de la entrega.
+                    Horario de reparto: Lun–Sáb 09:00 a 19:00 · Pago en efectivo o transferencia
+                    al momento de la entrega.
                 </p>
             </div>
 
-            <div class="col-lg-5 text-center">
-                <img src="https://img.freepik.com/premium-vector/cute-gallon-water-bottle-superhero-character-is-flying_152558-91601.jpg"
-                     class="img-fluid rounded-3 shadow-sm"
-                     alt="Planta de agua purificada">
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- PASOS DEL PEDIDO -->
-<div class="container my-5">
-    <h2 class="h4 text-center mb-4">Haz tu pedido en 3 pasos</h2>
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <span class="badge rounded-pill text-bg-primary fs-6">1</span>
+            <div class="col-md-5 text-center">
+                <div class="card shadow-sm border-0 product-highlight">
+                    <div class="card-body">
+                        <img src="https://static.vecteezy.com/system/resources/previews/003/320/907/non_2x/cute-water-drop-superhero-character-is-flying-free-vector.jpg"
+                             alt="Bidón superhéroe"
+                             class="img-fluid mb-3" style="max-height: 220px;">
+                        <p class="small text-muted mb-0">
+                            Bidones sellados, almacenados y monitoreados en planta
+                            con tecnología de sensores IoT. Tu agua, siempre lista para salir volando a la puerta de tu casa.
+                        </p>
                     </div>
-                    <h5 class="card-title fw-semibold">Elige tus productos</h5>
-                    <p class="card-text text-muted">
-                        Ingresa al <strong>catálogo</strong>, selecciona el formato
-                        de bidón que necesitas y añade las unidades al carrito.
-                    </p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <span class="badge rounded-pill text-bg-primary fs-6">2</span>
+    <!-- Franja divertida -->
+    <div class="fun-strip py-3 px-3 mb-4 rounded-3 shadow-sm d-flex flex-wrap justify-content-around align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-droplet"></i>
+            <span class="small">💧 Agua lista para tomar, sin hervir.</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-truck"></i>
+            <span class="small">🚚 Reparto en tu sector según disponibilidad.</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-emoji-smile"></i>
+            <span class="small">😄 Pides en minutos, te olvidas de cargar bidones.</span>
+        </div>
+    </div>
+
+    <!-- Sección de pasos -->
+    <div class="container my-5">
+        <h2 class="h4 text-center mb-4">Haz tu pedido en 3 pasos</h2>
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm text-center step-card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="step-number step-1">1</span>
+                        </div>
+                        <h5 class="card-title fw-semibold">Elige tus productos</h5>
+                        <p class="card-text small text-muted">
+                            Ingresa al catálogo, selecciona el formato de bidón
+                            y la cantidad que necesitas para tu hogar o negocio.
+                        </p>
                     </div>
-                    <h5 class="card-title fw-semibold">Confirma tus datos</h5>
-                    <p class="card-text text-muted">
-                        Completa el <strong>formulario de entrega</strong> con tu
-                        nombre, dirección, teléfono y sector. El RUT es opcional.
-                    </p>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <span class="badge rounded-pill text-bg-primary fs-6">3</span>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm text-center step-card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="step-number step-2">2</span>
+                        </div>
+                        <h5 class="card-title fw-semibold">Confirma tus datos</h5>
+                        <p class="card-text small text-muted">
+                            Completa el formulario de entrega con tu nombre, dirección,
+                            teléfono y sector. Si quieres, puedes marcar tu dirección
+                            directamente desde el mapa.
+                        </p>
                     </div>
-                    <h5 class="card-title fw-semibold">Recibe y paga al recibir</h5>
-                    <p class="card-text text-muted">
-                        Nuestro equipo coordina la entrega en tu horario disponible.
-                        Puedes pagar en <strong>efectivo</strong> o
-                        <strong>transferencia</strong> al momento de la entrega.
-                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm text-center step-card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="step-number step-3">3</span>
+                        </div>
+                        <h5 class="card-title fw-semibold">Recibe y paga al recibir</h5>
+                        <p class="card-text small text-muted">
+                            Nuestro equipo coordina la entrega en tu horario disponible
+                            y pagas en efectivo o transferencia al recibir los bidones.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formatos destacados -->
+        <h3 class="h5 text-center mb-3">Formatos más pedidos</h3>
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm text-center product-highlight">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Bidón 20 L</h5>
+                        <p class="small text-muted mb-2">Ideal para familias y oficinas.</p>
+                        <a href="{% url 'productos:catalogo_publico' %}" class="btn btn-outline-primary btn-sm">
+                            Ver en catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm text-center product-highlight">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Pack 3 × 20 L</h5>
+                        <p class="small text-muted mb-2">Ahorro para consumo frecuente.</p>
+                        <a href="{% url 'productos:catalogo_publico' %}" class="btn btn-outline-primary btn-sm">
+                            Ver en catálogo
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- BENEFICIOS CLAVE PARA EL CLIENTE -->
-<div class="container mb-5">
-    <h2 class="h4 text-center mb-4">¿Por qué elegir Planta San Miguel?</h2>
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="https://images.unsplash.com/photo-1581092334660-1c967f5b8f88?w=800"
-                     class="card-img-top" alt="Calidad de agua">
-                <div class="card-body">
-                    <h5 class="card-title fw-semibold">Calidad y seguridad</h5>
-                    <p class="card-text text-muted">
-                        Procesos de filtrado y purificación monitoreados con sensores,
-                        garantizando agua segura para consumo diario.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="https://images.unsplash.com/photo-1625246333195-78a28b5df2a3?w=800"
-                     class="card-img-top" alt="Logística">
-                <div class="card-body">
-                    <h5 class="card-title fw-semibold">Reparto a tiempo</h5>
-                    <p class="card-text text-muted">
-                        Rutas planificadas por sector para reducir tiempos de espera
-                        y asegurar entregas puntuales en tu domicilio o empresa.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="https://images.unsplash.com/photo-1581090700227-1e37b2c7d3e5?w=800"
-                     class="card-img-top" alt="Atención a empresas">
-                <div class="card-body">
-                    <h5 class="card-title fw-semibold">Hogar y empresas</h5>
-                    <p class="card-text text-muted">
-                        Atendemos hogares, oficinas y clientes industriales con
-                        volúmenes y frecuencias de entrega adaptados a tu necesidad.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- FRANJA DE CONTACTO RÁPIDO -->
-<div class="bg-primary text-light py-3">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center small">
-        <span>
-            ¿Dudas sobre zonas de reparto o pedidos especiales?
-        </span>
-        <span class="mt-2 mt-md-0">
-            Escríbenos desde la página de
-            <a href="{% url 'pages:contacto' %}" class="text-white text-decoration-underline">
-                contacto
-            </a>
-            o llámanos / WhatsApp al <strong>+56 9 1234 5678</strong>.
-        </span>
-    </div>
-</div>
+{% endif %}
 
 {% endblock %}

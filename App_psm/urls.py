@@ -21,6 +21,8 @@ urlpatterns = [
     path("reportes/", include("reportes.urls")),
     path("produccion/", include("produccion.urls")),
     path("productos/", include("productos.urls", namespace="productos")),
+    path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
+
 ]
 
 

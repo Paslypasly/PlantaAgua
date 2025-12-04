@@ -6,6 +6,7 @@ pip install django psycopg2-binary djangorestframework paho-mqtt python-dotenv  
 
 imstalar mqtt en windows = pip install paho-mqtt
 python -m pip install Pillow
+pip install django-widget-tweaks
 
 
 django-admin startproject planta_san_miguel .

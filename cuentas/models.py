@@ -18,7 +18,7 @@ class Usuario(AbstractUser):
         TECNICO = "TECNICO", "Técnico"
         AUDITOR = "AUDITOR", "Auditor"
 
-    # Mantengo ROL_CHOICES por si lo usas en otros lados
+
     ROL_CHOICES = Rol.choices
 
     rut_numero = models.CharField(

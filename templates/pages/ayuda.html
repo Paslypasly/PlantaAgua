@@ -1,53 +1,201 @@
 {% extends "base.html" %}
-{% block title %}Ayuda - Planta San Miguel{% endblock %}
+
+{% block title %}
+{% if user.is_authenticated %}
+Ayuda para usuarios internos - Planta San Miguel
+{% else %}
+Ayuda para clientes - Planta San Miguel
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-header {
+        background: linear-gradient(135deg, #e3f2ff, #ffffff);
+        border-radius: 12px;
+        padding: 2rem;
+    }
+    .faq-icon {
+        font-size: 2.2rem;
+        color: #0d6efd;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    /* Estilos ayuda interna */
+    .help-card-icon {
+        font-size: 2rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
+{% if user.is_authenticated %}
+
+
 <div class="container my-5">
 
-    <div class="text-center mb-4">
-        <h1 class="fw-bold">Centro de Ayuda</h1>
-        <p class="lead">Encuentra respuestas rápidas a tus dudas.</p>
+    <!-- ENCABEZADO USUARIOS INTERNOS -->
+    <div class="faq-header shadow-sm mb-5">
+        <div class="row align-items-center g-3">
+            <div class="col-md-1 text-center">
+                <i class="bi bi-life-preserver faq-icon"></i>
+            </div>
+            <div class="col-md-11">
+                <h1 class="fw-bold mb-1">Centro de Ayuda para Usuarios Internos</h1>
+                <p class="lead text-muted mb-0">
+                    Guía rápida para entender los módulos internos del sistema: paneles por rol,
+                    planta & sensores, producción, inventario y pedidos.
+                </p>
+            </div>
+        </div>
     </div>
 
-    <div class="accordion" id="ayudaAccordion">
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="q1">
-                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#a1">
-                    ¿Cómo iniciar sesión en la plataforma?
-                </button>
-            </h2>
-            <div id="a1" class="accordion-collapse collapse show">
-                <div class="accordion-body">
-                    Usa tu nombre de usuario y contraseña. Si no tienes acceso,
-                    solicita a un administrador que cree tu cuenta.
+    <!-- TARJETAS POR MÓDULO -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="help-card-icon text-primary mb-2">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">Panel según rol</h5>
+                    <p class="card-text small text-muted">
+                        Es la puerta de entrada a tus funciones principales. Desde aquí accedes a los
+                        módulos que necesitas según tu rol (Admin, Operario, Conductor, Gerente, etc.).
+                    </p>
+                    <ul class="small text-muted mb-0">
+                        <li>Resumen de indicadores clave.</li>
+                        <li>Accesos rápidos a módulos frecuentes.</li>
+                        <li>Visión filtrada según permisos.</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="q2">
-                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a2">
-                    ¿Cómo ver el estado de los estanques?
-                </button>
-            </h2>
-            <div id="a2" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    Desde el menú lateral, selecciona <strong>Planta → Estado de estanques</strong>.
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="help-card-icon text-primary mb-2">
+                        <i class="bi bi-water"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">Planta & Sensores</h5>
+                    <p class="card-text small text-muted">
+                        Muestra el estado de los estanques, bombas y lecturas IoT en tiempo real.
+                        Los datos llegan desde el ESP32 vía MQTT al backend Django.
+                    </p>
+                    <ul class="small text-muted mb-0">
+                        <li>Niveles de estanques y umbrales.</li>
+                        <li>Alarmas por sobrellenado o nivel crítico.</li>
+                        <li>Historial de lecturas y eventos.</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="help-card-icon text-primary mb-2">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">Producción e Inventario</h5>
+                    <p class="card-text small text-muted">
+                        Permite planificar y registrar la producción de bidones, así como
+                        los movimientos de inventario (insumos, bidones llenos/vacíos).
+                    </p>
+                    <ul class="small text-muted mb-0">
+                        <li>Plan de producción diaria.</li>
+                        <li>Registro de lotes producidos.</li>
+                        <li>Control de stock y movimientos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREGUNTAS FRECUENTES INTERNAS -->
+    <h2 class="h5 mb-3">Preguntas frecuentes de uso interno</h2>
+
+    <div class="accordion" id="ayudaInternaAccordion">
+
+        <!-- 1 -->
         <div class="accordion-item">
-            <h2 class="accordion-header" id="q3">
-                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a3">
-                    ¿Dónde veo mis pedidos asignados (conductores)?
+            <h2 class="accordion-header" id="iq1">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#ia1">
+                    ¿Qué hago si no veo un módulo que necesito?
                 </button>
             </h2>
-            <div id="a3" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    En el menú lateral, selecciona <strong>Pedidos asignados</strong>.
+            <div id="ia1" class="accordion-collapse collapse show">
+                <div class="accordion-body small">
+                    Probablemente tu rol no tiene permisos para ese módulo.
+                    Debes contactar a un <strong>Administrador del sistema</strong> para revisar tu usuario
+                    y asignar el rol correcto (por ejemplo, Operario, Conductor o Gerente).
+                </div>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="iq2">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#ia2">
+                    ¿Cómo interpreto las alertas de Planta & Sensores?
+                </button>
+            </h2>
+            <div id="ia2" class="accordion-collapse collapse">
+                <div class="accordion-body small">
+                    Las alertas se basan en los datos enviados por el ESP32 y los sensores conectados:
+                    <ul>
+                        <li><strong>Nivel crítico</strong>: estanque casi vacío, requiere programación de producción.</li>
+                        <li><strong>Nivel máximo</strong>: estanque lleno, se detiene automáticamente la bomba.</li>
+                        <li><strong>Error de sensor</strong>: lectura fuera de rango o desconexión.</li>
+                    </ul>
+                    El operario debe revisar físicamente la planta si se detectan inconsistencias.
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="iq3">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#ia3">
+                    ¿Cómo se relacionan pedidos, logística y producción?
+                </button>
+            </h2>
+            <div id="ia3" class="accordion-collapse collapse">
+                <div class="accordion-body small">
+                    El flujo estándar es:
+                    <ol>
+                        <li>El cliente realiza un <strong>pedido</strong> desde la web (módulo ventas).</li>
+                        <li>El sistema descuenta stock o genera necesidad de <strong>producción</strong>.</li>
+                        <li>Logística asigna <strong>ruta y vehículo</strong> para la entrega.</li>
+                        <li>Al entregar, se actualiza el estado del pedido y se registra el despacho.</li>
+                    </ol>
+                    Esto permite trazar el ciclo completo desde el estanque hasta el cliente.
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="iq4">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#ia4">
+                    ¿Qué debo hacer si un dato IoT no coincide con la realidad?
+                </button>
+            </h2>
+            <div id="ia4" class="accordion-collapse collapse">
+                <div class="accordion-body small">
+                    Primero, valida en terreno (nivel real del estanque, estado de la bomba).
+                    Si el dato sigue siendo inconsistente:
+                    <ul>
+                        <li>Revisa el estado del <strong>ESP32</strong> y su conexión a la red.</li>
+                        <li>Verifica el <strong>broker MQTT</strong> y la suscripción del backend.</li>
+                        <li>Registra el incidente para que el técnico revise el sensor físico.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -55,5 +203,191 @@
     </div>
 
 </div>
+
+{% else %}
+
+
+<div class="container my-5">
+
+    <!-- ENCABEZADO -->
+    <div class="faq-header text-center shadow-sm mb-5">
+        <i class="bi bi-question-circle faq-icon"></i>
+        <h1 class="fw-bold mt-3">Centro de Ayuda para Clientes</h1>
+        <p class="lead text-muted mb-0">
+            Resuelve tus dudas sobre pedidos, entregas, pagos y agua purificada.
+        </p>
+    </div>
+
+    <!-- PREGUNTAS FRECUENTES -->
+    <div class="accordion" id="ayudaAccordion">
+
+        <!-- 1 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q1">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#a1">
+                    ¿Cómo hago un pedido?
+                </button>
+            </h2>
+            <div id="a1" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    Es muy simple:
+                    <ol>
+                        <li>Entra al <strong>catálogo</strong> y selecciona tus productos.</li>
+                        <li>Añádelos al <strong>carrito</strong>.</li>
+                        <li>Completa tu <strong>formulario de entrega</strong>.</li>
+                        <li>Confirma el pedido. ¡Nosotros hacemos el resto!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q2">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a2">
+                    ¿Necesito crear una cuenta para comprar?
+                </button>
+            </h2>
+            <div id="a2" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    No. Puedes comprar sin registrarte.  
+                    Solo te pediremos:
+                    <ul>
+                        <li>Nombre</li>
+                        <li>Teléfono</li>
+                        <li>Dirección</li>
+                        <li>Sector de entrega</li>
+                    </ul>
+                    Si deseas, puedes registrarte para guardar tus datos para futuras compras.
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q3">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a3">
+                    ¿Qué formas de pago están disponibles?
+                </button>
+            </h2>
+            <div id="a3" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Puedes pagar de dos formas:
+                    <ul>
+                        <li><strong>Efectivo</strong> al momento de la entrega.</li>
+                        <li><strong>Transferencia bancaria</strong> directamente al repartidor.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q4">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a4">
+                    ¿Qué pasa si no estoy en casa cuando llegan?
+                </button>
+            </h2>
+            <div id="a4" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    El repartidor intentará contactarte por teléfono.  
+                    Si no logramos entregarlo, reagendaremos tu despacho según disponibilidad.
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q5">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a5">
+                    ¿Cómo se asegura la calidad del agua?
+                </button>
+            </h2>
+            <div id="a5" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    La planta utiliza:
+                    <ul>
+                        <li>Monitoreo IoT en tiempo real</li>
+                        <li>Sensores de nivel</li>
+                        <li>Control de purificación automatizado</li>
+                        <li>Bidones sellados y sanitizados</li>
+                    </ul>
+                    Esto garantiza que recibas agua segura y fresca.
+                </div>
+            </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q6">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a6">
+                    ¿Cuáles son los horarios de reparto?
+                </button>
+            </h2>
+            <div id="a6" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Repartimos de <strong>Lunes a Sábado, entre 09:00 y 19:00 hrs</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q7">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a7">
+                    ¿Puedo editar la dirección o cambiar el sector de entrega?
+                </button>
+            </h2>
+            <div id="a7" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Sí, mientras no confirmes el pedido.  
+                    En el checkout puedes escribir tu dirección manualmente o seleccionarla desde el mapa.
+                </div>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q8">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a8">
+                    ¿Cómo funciona el mapa de dirección?
+                </button>
+            </h2>
+            <div id="a8" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Puedes hacer clic en el mapa y automáticamente completaremos tu dirección
+                    usando geolocalización (OpenStreetMap).  
+                    Así evitas errores al escribir.
+                </div>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q9">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#a9">
+                    ¿Los bidones incluyen sello de seguridad?
+                </button>
+            </h2>
+            <div id="a9" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    Sí. Todos los bidones se entregan sellados y sanitizados,
+                    listos para ser usados en dispensadores o de forma directa.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA Final -->
+    <div class="text-center mt-5">
+        <h4 class="fw-semibold mb-3">¿Listo para hacer tu pedido?</h4>
+        <a href="{% url 'productos:catalogo_publico' %}" class="btn btn-primary btn-lg px-4">
+            Ir al catálogo
+        </a>
+    </div>
+
+</div>
+{% endif %}
 
 {% endblock %}

@@ -2,60 +2,69 @@
 {% block title %}Catálogo de productos{% endblock %}
 
 {% block content %}
-<h1 class="h4 mb-4">Catálogo de productos</h1>
+<h1 class="h3 mb-4 text-center">Catálogo de productos</h1>
 
-<div class="row g-3">
+{% if productos %}
+<div class="row g-4">
     {% for producto in productos %}
-    <div class="col-md-3">
-        <div class="card h-100 shadow-sm">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm border-0">
 
-            {# Imagen del producto (fuera del card-body para seguir estándar Bootstrap) #}
             {% if producto.image %}
                 <img src="{{ producto.image.url }}" class="card-img-top" alt="{{ producto.nombre }}">
             {% else %}
                 <img src="https://via.placeholder.com/400x250?text=Sin+imagen"
-                     class="card-img-top"
-                     alt="Sin imagen">
+                     class="card-img-top" alt="Sin imagen">
             {% endif %}
 
             <div class="card-body d-flex flex-column">
+                {% if producto.categoria %}
+                    <span class="badge bg-light text-secondary mb-2">
+                        {{ producto.categoria.nombre }}
+                    </span>
+                {% endif %}
 
-                <h6 class="card-title">{{ producto.nombre }}</h6>
+                <h6 class="card-title mb-1">{{ producto.nombre }}</h6>
 
                 <p class="small text-muted flex-grow-1">
                     {{ producto.descripcion|default:"Sin descripción" }}
                 </p>
 
-                <p class="fw-bold mb-2">$ {{ producto.precio_lista }}</p>
+                <p class="fw-bold mb-2">
+                    $ {{ producto.precio_lista }} CLP
+                    <br>
+                    <span class="small text-muted">
+                        {{ producto.presentacion_litros }} L
+                    </span>
+                </p>
 
-                <a href="{% url 'productos:detalle_publico' producto.pk %}"
-                     class="btn btn-outline-primary btn-sm mb-2">Ver detalle</a>
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'productos:detalle_publico' producto.pk %}"
+                       class="btn btn-outline-primary btn-sm">
+                        Ver detalle
+                    </a>
 
-
-                <!-- Formulario para agregar al carrito -->
-                <form method="post"
-                      action="{% url 'ventas:carrito_agregar' producto.pk %}">
-                    {% csrf_token %}
-                    <div class="input-group input-group-sm">
-                        <input type="number"
-                               name="cantidad"
-                               value="1"
-                               min="1"
-                               class="form-control"
-                               aria-label="Cantidad">
-                        <button class="btn btn-primary" type="submit">
-                            Agregar al carrito
-                        </button>
-                    </div>
-                </form>
-
+                    <form method="post"
+                          action="{% url 'ventas:carrito_agregar' producto.pk %}">
+                        {% csrf_token %}
+                        <div class="input-group input-group-sm">
+                            <input type="number" name="cantidad" value="1" min="1"
+                                   class="form-control" aria-label="Cantidad">
+                            <button class="btn btn-primary" type="submit">
+                                Agregar al carrito
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
         </div>
-    </div>
-    {% empty %}
-    <div class="col-12">
-        <p class="text-muted">No hay productos disponibles.</p>
     </div>
     {% endfor %}
 </div>
+{% else %}
+<p class="text-muted text-center">
+    No hay productos disponibles por el momento.
+</p>
+{% endif %}
 {% endblock %}
