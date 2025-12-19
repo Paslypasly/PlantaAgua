@@ -1,8 +1,11 @@
+# ventas/views.py
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, TemplateView, FormView
+from django.views.decorators.http import require_POST
+
 from core.mixins import RolRequiredMixin
 from .models import Pedido
 from .services import CartService, crear_pedido_desde_carrito
@@ -35,7 +38,6 @@ class PedidoCreateView(RolRequiredMixin, CreateView):
         response = super().form_valid(form)
         pedido: Pedido = self.object
 
-        # Auditoría
         registrar_evento(
             modulo="VENTAS",
             descripcion=f"Pedido interno {pedido.numero} creado por {self.request.user.username}",
@@ -45,7 +47,7 @@ class PedidoCreateView(RolRequiredMixin, CreateView):
 
 
 # =====================================================
-# VISTAS PÚBLICAS – CARRITO
+# VISTAS PÚBLICAS – CARRITO (SESION)
 # =====================================================
 
 class CarritoView(TemplateView):
@@ -63,7 +65,6 @@ class CarritoAgregarView(View):
     def post(self, request, producto_id: int):
         cart = CartService(request)
 
-        # Intentar obtener cantidad válida
         try:
             cantidad = int(request.POST.get("cantidad", "1"))
         except ValueError:
@@ -76,6 +77,24 @@ class CarritoAgregarView(View):
         cart.add(producto_id, cantidad=cantidad)
         messages.success(request, "Producto agregado al carrito.")
         return redirect("productos:catalogo_publico")
+
+
+from django.views.decorators.http import require_POST
+
+@require_POST
+def carrito_actualizar(request, producto_id):
+    try:
+        cantidad = int(request.POST.get("cantidad", "1"))
+    except ValueError:
+        cantidad = 1
+
+    if cantidad < 1:
+        cantidad = 1
+
+    cart = CartService(request)
+    cart.set(producto_id, cantidad)
+    return redirect("ventas:carrito")
+
 
 
 class CarritoEliminarView(View):
@@ -104,13 +123,9 @@ class CheckoutPublicoView(FormView):
             form.add_error(None, "El carrito está vacío.")
             return self.form_invalid(form)
 
-        # Crear pedido
         pedido = crear_pedido_desde_carrito(cart, form.cleaned_data)
-
-        # Vaciar carrito
         cart.clear()
 
-        # === Auditoría ===
         registrar_evento(
             modulo="VENTAS",
             descripcion=(
@@ -120,7 +135,6 @@ class CheckoutPublicoView(FormView):
             severidad="INFO",
         )
 
-        # === Notificaciones automáticas ===
         crear_notificacion_para_roles(
             roles=["ADMIN", "OPERARIO"],
             tipo="SISTEMA",
@@ -131,11 +145,9 @@ class CheckoutPublicoView(FormView):
             ),
         )
 
-        # Mensaje para el cliente
         messages.success(
             self.request,
             f"Tu pedido {pedido.numero} fue registrado correctamente. "
             "Nos contactaremos contigo para coordinar la entrega."
         )
-
         return redirect("productos:catalogo_publico")

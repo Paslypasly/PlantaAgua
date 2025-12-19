@@ -35,9 +35,8 @@ class CheckoutPublicoForm(forms.Form):
     )
 
     sector_entrega = forms.ModelChoiceField(
-        label="Sector de entrega",
         queryset=SectorEntrega.objects.all(),
-        empty_label="Seleccione un sector",
+        empty_label="Seleccione sector",
     )
 
     direccion = forms.CharField(
@@ -107,17 +106,16 @@ class CheckoutPublicoForm(forms.Form):
             "placeholder", "Instrucciones especiales de entrega (opcional)"
         )
 
-    def clean_rut_numero(self):
-        """
-        Rut opcional: si viene, normalizamos y validamos longitud (7 u 8 dígitos).
-        El DV se calcula en otra capa.
-        """
-        data = self.cleaned_data.get("rut_numero", "").strip()
-        if not data:
-            return ""
+def clean_rut_numero(self):
+    data = (self.cleaned_data.get("rut_numero") or "").strip()
+    if not data:
+        return ""
 
-        rut_numero = normalizar_rut_numero(data)
-        if not rut_numero.isdigit() or len(rut_numero) not in (7, 8):
-            raise forms.ValidationError("El RUT debe tener 7 u 8 dígitos numéricos.")
+    rut_numero = normalizar_rut_numero(data)
 
-        return rut_numero
+    rut_numero = str(rut_numero).strip()  # <-- CLAVE
+    if not rut_numero.isdigit() or len(rut_numero) not in (7, 8):
+        raise forms.ValidationError("El RUT debe tener 7 u 8 dígitos numéricos.")
+
+    return rut_numero
+

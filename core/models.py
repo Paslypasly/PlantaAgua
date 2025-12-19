@@ -1,5 +1,8 @@
 from django.db import models
 from .utils import rut as rut_utils
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 class BaseModel(models.Model):
     """
@@ -16,40 +19,71 @@ class BaseModel(models.Model):
 
 class EntidadConRut(BaseModel):
     """
-    Entidad abstracta que trabaja con RUT separado:
-    - rut_numero: solo dígitos (sin puntos ni guion)
-    - rut_dv: '0'-'9' o 'K'
-    El DV se calcula automáticamente a partir de rut_numero.
+    Guarda RUT separado en:
+    - rut: número SIN DV (ej: 21734979)
+    - dv: dígito verificador (0-9 o K)
+    Ambos opcionales.
     """
-    rut_numero = models.CharField(max_length=8, verbose_name="RUT (sin DV)")
-    rut_dv = models.CharField(max_length=1, verbose_name="DV")
+    rut = models.CharField(
+        max_length=8,
+        blank=True,
+        null=True,
+        verbose_name="RUT (sin DV)",
+        help_text="Sin puntos ni guion, solo los 7 u 8 dígitos."
+    )
+    dv = models.CharField(
+        max_length=1,
+        blank=True,
+        default="",
+        verbose_name="DV"
+    )
 
     class Meta:
         abstract = True
 
-    def get_rut_completo(self) -> str:
-        return f"{self.rut_numero}-{self.rut_dv}"
+    @staticmethod
+    def calcular_dv(rut: str) -> str:
+        """
+        Algoritmo módulo 11 para DV chileno.
+        """
+        rut_str = str(rut).strip()
+        if not rut_str.isdigit():
+            return ""
+        serie = [2, 3, 4, 5, 6, 7]
+        suma = 0
+        j = 0
+        for dig in reversed(rut_str):
+            suma += int(dig) * serie[j]
+            j = (j + 1) % len(serie)
+
+        resto = 11 - (suma % 11)
+        if resto == 11:
+            return "0"
+        if resto == 10:
+            return "K"
+        return str(resto)
 
     @property
     def rut_completo(self) -> str:
-        return self.get_rut_completo()
+        if not self.rut:
+            return "-"
+        dv = (self.dv or self.calcular_dv(self.rut)).upper()
+        return f"{self.rut}-{dv}"
 
     def clean(self):
         super().clean()
-        # Normalizar y validar longitud
-        rut_num = rut_utils.normalizar_rut_numero(self.rut_numero)
-        if len(rut_num) not in (7, 8):
-            raise ValueError("El RUT debe tener 7 u 8 dígitos (sin DV).")
-        self.rut_numero = rut_num
-        # Calcular DV automáticamente
-        self.rut_dv = rut_utils.calcular_dv(self.rut_numero)
+        if not self.rut:
+            return
+        dv_ingresado = (self.dv or "").strip().upper()
+        dv_calculado = self.calcular_dv(self.rut)
+        if dv_ingresado and dv_ingresado != dv_calculado:
+            raise ValidationError({"dv": f"DV inválido. Para {self.rut} debe ser {dv_calculado}."})
 
     def save(self, *args, **kwargs):
-        # Asegurar cálculo de DV incluso si no se llamó clean() desde un form
-        rut_num = rut_utils.normalizar_rut_numero(self.rut_numero)
-        self.rut_numero = rut_num
-        self.rut_dv = rut_utils.calcular_dv(self.rut_numero)
-        super().save(*args, **kwargs)
+        if self.rut and not (self.dv or "").strip():
+            self.dv = self.calcular_dv(self.rut)
+        if self.dv:
+            self.dv = self.dv.strip().upper()
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
-    def __str__(self) -> str:
-        return self.rut_completo

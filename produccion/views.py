@@ -1,24 +1,37 @@
 # produccion/views.py
 from django.utils import timezone
 from django.views.generic import TemplateView, ListView, DetailView
-
+from django.views.generic import TemplateView
+from core.mixins import RolRequiredMixin
+from .models import LoteProduccion
 from core.mixins import RolRequiredMixin
 from .models import LoteProduccion
 
 
 class PlanProduccionDiariaView(RolRequiredMixin, TemplateView):
     """
-    Vista tipo resumen de producción.
-    De momento muestra la fecha de hoy y los últimos lotes.
+    Muestra el plan de producción del día actual.
     """
     template_name = "produccion/plan_produccion_diaria.html"
-    rol_requerido = None  # cualquier usuario autenticado
+    rol_requerido = None  # todos los usuarios autenticados pueden verla
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["hoy"] = timezone.localdate()
-        # Ordenamos por id para no depender de campos que quizá no existan
-        ctx["lotes"] = LoteProduccion.objects.all().order_by("-id")[:20]
+
+        hoy = timezone.localdate()
+
+        # Lotes con fecha del día actual
+        lotes_hoy = LoteProduccion.objects.filter(fecha=hoy).order_by("id")
+
+        # Sumar litros totales del día
+        total_litros_hoy = sum(float(l.litros or 0) for l in lotes_hoy)
+
+        ctx.update({
+            "hoy": hoy,
+            "lotes_hoy": lotes_hoy,
+            "total_litros_hoy": total_litros_hoy,
+        })
+
         return ctx
 
 

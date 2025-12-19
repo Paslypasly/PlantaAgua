@@ -10,4 +10,5 @@ urlpatterns = [
     path("ayuda/", AyudaView.as_view(), name="ayuda"),
     path("contacto/", ContactoView.as_view(), name="contacto"),
     path("soporte/", SoporteView.as_view(), name="soporte"),
+    
 ]

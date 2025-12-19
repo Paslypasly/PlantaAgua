@@ -1,62 +1,417 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Estado de Estanques · Planta San Miguel{% endblock %}
 
 {% block content %}
+<style>
+  /* ====== BIDÓN VISUAL (reutilizable) ====== */
+  .bidon-wrap{
+    display:flex;
+    gap:14px;
+    align-items:center;
+  }
+  .bidon {
+    width: 64px;
+    height: 140px;
+    border: 2px solid rgba(0,0,0,.18);
+    border-radius: 14px 14px 12px 12px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0,0,0,.03);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+  }
+  .bidon::before{
+    content:"";
+    position:absolute;
+    top:-10px;
+    left:50%;
+    transform:translateX(-50%);
+    width: 30px;
+    height: 18px;
+    border: 2px solid rgba(0,0,0,.18);
+    border-bottom:none;
+    border-radius: 10px 10px 0 0;
+    background: rgba(255,255,255,.5);
+  }
+  .bidon .water {
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:0%;
+    background: linear-gradient(180deg, rgba(13,110,253,.55), rgba(13,110,253,.85));
+    transition: height .35s ease;
+  }
+  .bidon .shine{
+    position:absolute;
+    top:14px;
+    left:10px;
+    width:12px;
+    height:110px;
+    border-radius:999px;
+    background: rgba(255,255,255,.35);
+    filter: blur(.2px);
+  }
+  .bidon.small{
+    width: 44px;
+    height: 96px;
+    border-radius: 12px;
+  }
+  .bidon.small::before{
+    width: 22px;
+    height: 14px;
+    top:-8px;
+  }
+  .bidon.small .shine{
+    height:74px;
+  }
+
+  .stock-label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .stock-title{
+    font-size:.85rem;
+    color: rgba(0,0,0,.6);
+  }
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">
-        <i class="bi bi-water"></i> Estado de Estanques
-    </h1>
+  <h1 class="h4 mb-0">
+    <i class="bi bi-water"></i> Estado de Estanques
+  </h1>
+
+  <div class="d-flex align-items-center gap-2">
+    <button id="btnSound" class="btn btn-outline-primary btn-sm" type="button">
+      Activar sonido
+    </button>
+    <small class="text-muted">
+      Última actualización: <span id="lastUpdate">--:--:--</span>
+    </small>
+  </div>
 </div>
 
-<div class="row g-3">
-    {% for estanque in estanques %}
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ estanque.nombre|default:"Estanque sin nombre" }}
-                    </h5>
-                    <p class="card-subtitle mb-2 text-muted">
-                        Tipo: {{ estanque.tipo|default:"-" }}
-                    </p>
+<div class="row g-3" id="cards">
+  {% for estanque in estanques %}
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title">{{ estanque.nombre|default:"Estanque" }}</h5>
+        <p class="card-subtitle mb-2 text-muted">
+          Tipo: {{ estanque.get_tipo_display|default:estanque.tipo|default:"-" }}
+        </p>
 
-                    <div class="mb-2">
-                        <span class="fw-semibold">Capacidad:</span>
-                        {{ estanque.capacidad_litros|default:"-" }} L
-                    </div>
+        {% if estanque.nombre|lower == "tanque 2"|lower %}
+          <div class="mb-2">
+            <span class="fw-semibold">pH actual:</span>
+            <span id="ph-{{ estanque.id }}">{% if estanque.ph_actual %}{{ estanque.ph_actual }}{% else %}-{% endif %}</span>
+          </div>
+          <div class="mb-2">
+            <span class="fw-semibold">pH raw:</span>
+            <span id="phraw-{{ estanque.id }}">{% if estanque.ph_raw %}{{ estanque.ph_raw }}{% else %}-{% endif %}</span>
+          </div>
+        {% else %}
 
-                    <div class="mb-2">
-                        <span class="fw-semibold">Volumen actual:</span>
-                        {{ estanque.volumen_actual_litros|default:"-" }} L
-                    </div>
+          <!-- ===== Bidón visual de nivel (TANQUE 1 / nivel) ===== -->
+          <div class="bidon-wrap mb-2">
+            <div class="bidon" aria-label="Representación nivel agua">
+              <div class="water" id="jugFill-{{ estanque.id }}" style="height: {{ estanque.nivel_porcentaje|default:0 }}%;"></div>
+              <div class="shine"></div>
+            </div>
 
-                    <div class="mb-3">
-                        <span class="fw-semibold">Nivel estimado:</span>
-                        {{ estanque.nivel_porcentaje|default:"-" }}%
-                        <div class="progress mt-1" style="height: 8px;">
-                            <div class="progress-bar"
-                                 role="progressbar"
-                                 style="width: {{ estanque.nivel_porcentaje|default:0 }}%;">
-                            </div>
-                        </div>
-                    </div>
+            <div class="flex-grow-1">
+              <div class="mb-2">
+                <span class="fw-semibold">Capacidad:</span>
+                <span id="cap-{{ estanque.id }}">{{ estanque.capacidad_litros|default:"-" }}</span> L
+              </div>
 
-                    <span class="badge 
-                        {% if estanque.estado == 'OK' %}bg-success
-                        {% elif estanque.estado == 'ALERTA' %}bg-danger
-                        {% else %}bg-secondary{% endif %}">
-                        {{ estanque.estado|default:"SIN ESTADO" }}
-                    </span>
+              <div class="mb-2">
+                <span class="fw-semibold">Volumen actual:</span>
+                <span id="vol-{{ estanque.id }}">{{ estanque.volumen_actual_litros|default:"-" }}</span> L
+              </div>
+
+              <div class="mb-3">
+                <span class="fw-semibold">Nivel estimado:</span>
+                <span id="pct-{{ estanque.id }}">{{ estanque.nivel_porcentaje|default:"-" }}</span>%
+                <div class="progress mt-1" style="height: 8px;">
+                  <div class="progress-bar" id="bar-{{ estanque.id }}" role="progressbar"
+                       style="width: {{ estanque.nivel_porcentaje|default:0 }}%;">
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                No hay estanques registrados aún.
-            </div>
-        </div>
-    {% endfor %}
+          </div>
+        {% endif %}
+
+        <span class="badge
+          {% if estanque.estado == 'OK' %}bg-success
+          {% elif 'ALERTA' in estanque.estado %}bg-danger
+          {% elif 'AVISO' in estanque.estado %}bg-warning text-dark
+          {% else %}bg-secondary{% endif %}"
+          id="st-{{ estanque.id }}">
+          {{ estanque.estado|default:"SIN ESTADO" }}
+        </span>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
+
+<!-- INVENTARIO IR 10/20 -->
+<div class="card shadow-sm mt-4">
+  <div class="card-body d-flex justify-content-between align-items-start flex-wrap gap-3">
+    <div>
+      <h5 class="mb-1">Inventario de bidones (IR)</h5>
+      <p class="text-muted mb-3">Seleccione +/- y el tipo (10L/20L) y luego pase un bidón por el sensor IR.</p>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="stock-label">
+            <!-- mini-bidón 10L (decorativo) -->
+            <div class="bidon small" title="Bidón 10L">
+              <div class="water" style="height: 85%;"></div>
+              <div class="shine"></div>
+            </div>
+            <div>
+              <div class="stock-title">Stock 10L</div>
+              <div class="display-6 mb-0" id="inv10">{{ inventario.stock_10 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="stock-label">
+            <!-- mini-bidón 20L (decorativo) -->
+            <div class="bidon small" title="Bidón 20L">
+              <div class="water" style="height: 85%;"></div>
+              <div class="shine"></div>
+            </div>
+            <div>
+              <div class="stock-title">Stock 20L</div>
+              <div class="display-6 mb-0" id="inv20">{{ inventario.stock_20 }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 align-items-center flex-wrap mt-2">
+        <span class="text-muted">Modo:</span>
+        <span class="badge bg-secondary" id="invMode">{{ inventario.modo_pendiente }}</span>
+
+        <span class="text-muted">Tipo:</span>
+        <span class="badge bg-info text-dark" id="invType">{{ inventario.tipo_pendiente }}</span>
+
+        <span class="text-muted">ESP:</span>
+        <span class="badge bg-dark" id="invEsp">{{ inventario.ultimo_contador_esp }}</span>
+      </div>
+
+      <div class="text-muted mt-2 small" id="invLast">{{ inventario.ultima_accion }}</div>
+    </div>
+
+    <div class="d-flex flex-column gap-2 align-items-end">
+      <div class="btn-group">
+        <button type="button" class="btn btn-success" id="btnModeIn">+</button>
+        <button type="button" class="btn btn-danger" id="btnModeOut">-</button>
+        <button type="button" class="btn btn-secondary" id="btnModeNone">X</button>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-outline-primary" id="btnType10">10L</button>
+        <button type="button" class="btn btn-outline-primary" id="btnType20">20L</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Audios -->
+<audio id="snd85" src="{% static 'audios/aviso85.mp3' %}" preload="auto"></audio>
+<audio id="snd95" src="{% static 'audios/alerta95.mp3' %}" preload="auto"></audio>
+<audio id="sndPh" src="{% static 'audios/alerta_ph.mp3' %}" preload="auto"></audio>
+
+<script>
+(() => {
+  const API_URL = "{% url 'estado_estanques_api' %}";
+  const INV_SEL_URL = "{% url 'inventario_set_selection_api' %}";
+
+  const btnSound = document.getElementById("btnSound");
+  const lastUpdate = document.getElementById("lastUpdate");
+
+  const snd85 = document.getElementById("snd85");
+  const snd95 = document.getElementById("snd95");
+  const sndPh = document.getElementById("sndPh");
+
+  let soundEnabled = false;
+  let fired85 = false, fired95 = false, firedPh = false;
+
+  // Inventario UI
+  const inv10 = document.getElementById("inv10");
+  const inv20 = document.getElementById("inv20");
+  const invMode = document.getElementById("invMode");
+  const invType = document.getElementById("invType");
+  const invEsp = document.getElementById("invEsp");
+  const invLast = document.getElementById("invLast");
+
+  const btnModeIn = document.getElementById("btnModeIn");
+  const btnModeOut = document.getElementById("btnModeOut");
+  const btnModeNone = document.getElementById("btnModeNone");
+
+  const btnType10 = document.getElementById("btnType10");
+  const btnType20 = document.getElementById("btnType20");
+
+  const LS_MODE = "psm_inv_mode";
+  const LS_TYPE = "psm_inv_type";
+
+  function paintMode(mode) {
+    invMode.textContent = mode;
+
+    btnModeIn.classList.remove("opacity-50");
+    btnModeOut.classList.remove("opacity-50");
+    btnModeNone.classList.remove("opacity-50");
+
+    if (mode === "IN") { btnModeOut.classList.add("opacity-50"); btnModeNone.classList.add("opacity-50"); }
+    else if (mode === "OUT") { btnModeIn.classList.add("opacity-50"); btnModeNone.classList.add("opacity-50"); }
+    else { btnModeIn.classList.add("opacity-50"); btnModeOut.classList.add("opacity-50"); }
+  }
+
+  function paintType(typ) {
+    invType.textContent = typ;
+
+    btnType10.classList.remove("active");
+    btnType20.classList.remove("active");
+
+    if (typ === "L10") btnType10.classList.add("active");
+    if (typ === "L20") btnType20.classList.add("active");
+  }
+
+  async function setSelection(patch) {
+    const mode = (patch.mode ?? (localStorage.getItem(LS_MODE) || invMode.textContent || "NONE")).toUpperCase();
+    const type = (patch.type ?? (localStorage.getItem(LS_TYPE) || invType.textContent || "L10")).toUpperCase();
+
+    localStorage.setItem(LS_MODE, mode);
+    localStorage.setItem(LS_TYPE, type);
+    paintMode(mode);
+    paintType(type);
+
+    try {
+      await fetch(INV_SEL_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ mode, type })
+      });
+    } catch (e) {}
+  }
+
+  btnModeIn.addEventListener("click", () => setSelection({mode:"IN"}));
+  btnModeOut.addEventListener("click", () => setSelection({mode:"OUT"}));
+  btnModeNone.addEventListener("click", () => setSelection({mode:"NONE"}));
+
+  btnType10.addEventListener("click", () => setSelection({type:"L10"}));
+  btnType20.addEventListener("click", () => setSelection({type:"L20"}));
+
+  // init desde localStorage
+  const initMode = (localStorage.getItem(LS_MODE) || (invMode.textContent || "NONE")).toUpperCase();
+  const initType = (localStorage.getItem(LS_TYPE) || (invType.textContent || "L10")).toUpperCase();
+  paintMode(["IN","OUT","NONE"].includes(initMode) ? initMode : "NONE");
+  paintType(["L10","L20"].includes(initType) ? initType : "L10");
+
+  // Audio unlock
+  btnSound.addEventListener("click", async () => {
+    try {
+      await snd85.play(); snd85.pause(); snd85.currentTime = 0;
+      await snd95.play(); snd95.pause(); snd95.currentTime = 0;
+      await sndPh.play(); sndPh.pause(); sndPh.currentTime = 0;
+
+      soundEnabled = true;
+      btnSound.textContent = "Sonido activado";
+      btnSound.classList.remove("btn-outline-primary");
+      btnSound.classList.add("btn-success");
+    } catch (e) {
+      alert("No se pudo activar audio. Haz click nuevamente.");
+    }
+  });
+
+  function setBadge(id, estado) {
+    const el = document.getElementById(`st-${id}`);
+    if (!el) return;
+
+    el.textContent = estado || "";
+    el.className = "badge";
+
+    if (estado === "OK") el.classList.add("bg-success");
+    else if ((estado || "").includes("ALERTA")) el.classList.add("bg-danger");
+    else if ((estado || "").includes("AVISO")) el.classList.add("bg-warning","text-dark");
+    else el.classList.add("bg-secondary");
+  }
+
+  async function tick() {
+    try {
+      const res = await fetch(API_URL, { cache: "no-store" });
+      const payload = await res.json();
+
+      lastUpdate.textContent = new Date().toLocaleTimeString();
+
+      // estanques
+      const estanques = payload.estanques || [];
+      for (const e of estanques) {
+        const nombre = (e.nombre || "").toLowerCase();
+
+        if (nombre === "tanque 2") {
+          const phEl = document.getElementById(`ph-${e.id}`);
+          const phRawEl = document.getElementById(`phraw-${e.id}`);
+          if (phEl) phEl.textContent = (e.ph ?? "-");
+          if (phRawEl) phRawEl.textContent = (e.ph_raw ?? "-");
+          setBadge(e.id, e.estado);
+
+          const isPhAlert = (e.estado || "").includes("ALERTA");
+          if (soundEnabled && isPhAlert && !firedPh) { sndPh.currentTime = 0; sndPh.play(); firedPh = true; }
+          if (!isPhAlert) firedPh = false;
+
+        } else {
+          const pct = Number(e.nivel_porcentaje || 0);
+
+          const capEl = document.getElementById(`cap-${e.id}`);
+          const volEl = document.getElementById(`vol-${e.id}`);
+          const pctEl = document.getElementById(`pct-${e.id}`);
+          const barEl = document.getElementById(`bar-${e.id}`);
+
+          if (capEl) capEl.textContent = e.capacidad_litros ?? "-";
+          if (volEl) volEl.textContent = (e.volumen_actual_litros ?? "-");
+          if (pctEl) pctEl.textContent = isFinite(pct) ? Math.round(pct) : "-";
+          if (barEl) barEl.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+
+          // ✅ actualizar bidón visual (esto es lo único “nuevo” en JS)
+          const jug = document.getElementById(`jugFill-${e.id}`);
+          if (jug) jug.style.height = `${Math.max(0, Math.min(100, pct))}%`;
+
+          setBadge(e.id, e.estado);
+
+          if (soundEnabled) {
+            if (pct >= 95 && !fired95) { snd95.currentTime = 0; snd95.play(); fired95 = true; }
+            if (pct >= 85 && pct < 95 && !fired85) { snd85.currentTime = 0; snd85.play(); fired85 = true; }
+            if (pct < 80) { fired85 = false; fired95 = false; }
+          }
+        }
+      }
+
+      // inventario
+      const inv = payload.inventario || null;
+      if (inv) {
+        inv10.textContent = inv.stock_10 ?? 0;
+        inv20.textContent = inv.stock_20 ?? 0;
+        invEsp.textContent = inv.ultimo_contador_esp ?? 0;
+        invLast.textContent = inv.ultima_accion ?? "";
+
+        if (!localStorage.getItem(LS_MODE)) paintMode((inv.modo_pendiente || "NONE").toUpperCase());
+        if (!localStorage.getItem(LS_TYPE)) paintType((inv.tipo_pendiente || "L10").toUpperCase());
+      }
+
+    } catch (e) {}
+  }
+
+  tick();
+  setInterval(tick, 2000);
+})();
+</script>
 {% endblock %}

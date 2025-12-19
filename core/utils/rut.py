@@ -1,57 +1,59 @@
 # core/utils/rut.py
 
-def _solo_digitos(valor: str) -> str:
-    return "".join(ch for ch in valor if ch.isdigit())
-
-
-def calcular_dv(rut_numero: str | int) -> str:
+def normalizar_rut_numero(valor: str) -> str:
     """
-    Calcula el dígito verificador de un RUT chileno
-    a partir de los 7 u 8 dígitos sin DV.
+    Limpia el RUT y deja solo dígitos (sin puntos, sin guion, sin DV).
+    Ej: "12.345.678" -> "12345678"
     """
-    rut_str = str(rut_numero)
-    rut_str = _solo_digitos(rut_str)
+    if valor is None:
+        return ""
+    s = str(valor).strip().replace(".", "").replace("-", "").replace(" ", "")
+    # si alguien mete el DV pegado (ej: 12345678K), lo cortamos
+    # porque este helper es "sin DV"
+    if len(s) >= 2 and (s[-1].upper() == "K" or s[-1].isdigit()):
+        # si el string tiene letras o es largo, intentamos dejar solo dígitos
+        # (en tu form pides sin DV, así que esto es para “defenderse”)
+        pass
+    return "".join(ch for ch in s if ch.isdigit())
 
-    if not rut_str.isdigit():
-        raise ValueError("El RUT debe contener solo dígitos.")
 
-    num = int(rut_str)
-    suma = 0
-    multiplicador = 2
+def calcular_dv(rut_numero: str) -> str:
+    """
+    Calcula DV del RUT (módulo 11).
+    Recibe SOLO el número (sin DV).
+    Retorna '0'..'9' o 'K'.
+    """
+    rut = normalizar_rut_numero(rut_numero)
+    if not rut or not rut.isdigit():
+        return ""
 
-    while num > 0:
-        suma += (num % 10) * multiplicador
-        num //= 10
-        multiplicador += 1
-        if multiplicador > 7:
-            multiplicador = 2
+    reversed_digits = list(map(int, reversed(rut)))
+    factors = [2, 3, 4, 5, 6, 7]
+    s = 0
+    for i, d in enumerate(reversed_digits):
+        s += d * factors[i % len(factors)]
 
-    resto = suma % 11
-    dv = 11 - resto
-
-    if dv == 11:
+    mod = 11 - (s % 11)
+    if mod == 11:
         return "0"
-    if dv == 10:
+    if mod == 10:
         return "K"
-    return str(dv)
-
-
-def normalizar_rut_numero(rut_numero: str) -> str:
-    """
-    Deja el número de RUT solo con dígitos (sin puntos ni guion).
-    No hace padding a 8 dígitos, eso se valida aparte.
-    """
-    rut_str = _solo_digitos(str(rut_numero))
-    return rut_str
+    return str(mod)
 
 
 def validar_rut_completo(rut_numero: str, dv: str) -> bool:
     """
-    Valida que el DV entregado corresponda al rut_numero.
+    Valida (rut, dv). DV puede venir en minúscula.
     """
-    try:
-        dv_calculado = calcular_dv(rut_numero)
-    except ValueError:
+    if rut_numero is None or dv is None:
         return False
 
-    return dv_calculado.upper() == str(dv).upper()
+    rut = normalizar_rut_numero(rut_numero)
+    dv_in = str(dv).strip().upper()
+
+    if not rut or not rut.isdigit():
+        return False
+    if dv_in not in "0123456789K":
+        return False
+
+    return calcular_dv(rut) == dv_in

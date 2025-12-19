@@ -31,11 +31,10 @@
             {% for lote in lotes_hoy %}
                 <tr>
                     <td>{{ lote.id }}</td>
-                    <td>{{ lote.hora_inicio|time:"H:i" }}</td>
-                    <td>{{ lote.hora_fin|time:"H:i" }}</td>
+                    <td>{{ lote.hora_inicio|default:"-" }}</td>
+                    <td>{{ lote.hora_fin|default:"-" }}</td>
                     <td>{{ lote.estanque.nombre|default:"-" }}</td>
-                    <td>{{ lote.litros_producidos|default:"-" }}</td>
-                    <td>{{ lote.estado|default:"-" }}</td>
+                    <td>{{ lote.litros|floatformat:1 }}</td>
                     <td class="text-end">
                         <a href="{% url 'orden_produccion_detalle' lote.pk %}"
                            class="btn btn-sm btn-outline-primary">

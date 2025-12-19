@@ -125,6 +125,69 @@ class PanelAdminView(LoginRequiredMixin, RolRequiredMixin, TemplateView):
     template_name = "cuentas/panel_admin.html"
     rol_requerido = Usuario.Rol.ADMIN
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        from django.utils import timezone
+
+        # -------- USUARIOS --------
+        ctx["total_usuarios"] = Usuario.objects.count()
+
+        # -------- CLIENTES --------
+        try:
+            from clientes.models import Cliente
+            ctx["total_clientes"] = Cliente.objects.count()
+        except Exception:
+            ctx["total_clientes"] = 0
+
+        # -------- SENSORES --------
+        try:
+            from sensores.models import Sensor
+            ctx["sensores_activos"] = Sensor.objects.filter(activo=True).count()
+            ctx["total_sensores"] = Sensor.objects.count()
+        except Exception:
+            ctx["sensores_activos"] = 0
+            ctx["total_sensores"] = 0
+
+        # -------- ACTUADORES --------
+        try:
+            from sensores.models import Actuador
+            ctx["actuadores_on"] = Actuador.objects.filter(estado_on=True).count()
+            ctx["total_actuadores"] = Actuador.objects.count()
+        except Exception:
+            ctx["actuadores_on"] = 0
+            ctx["total_actuadores"] = 0
+
+        # -------- ALERTAS --------
+        try:
+            from sensores.models import Alerta
+            # solo alertas de sensores activos y no atendidas
+            ctx["alertas_abiertas"] = Alerta.objects.filter(
+                atendida=False,
+                sensor__activo=True
+            ).count()
+            ctx["ultimas_alertas"] = Alerta.objects.filter(
+                atendida=False,
+                sensor__activo=True
+            ).order_by("-created_at")[:5]
+        except Exception:
+            ctx["alertas_abiertas"] = 0
+            ctx["ultimas_alertas"] = []
+
+        # -------- LECTURAS RECIENTES --------
+        try:
+            from sensores.models import LecturaSensor
+            ctx["lecturas_recientes"] = (
+                LecturaSensor.objects.select_related("sensor")
+                .order_by("-fecha_hora")[:5]
+            )
+        except Exception:
+            ctx["lecturas_recientes"] = []
+
+        ctx["hoy"] = timezone.localdate()
+        return ctx
+
+
+
 
 class PanelOperarioView(LoginRequiredMixin, RolRequiredMixin, TemplateView):
     template_name = "cuentas/panel_operario.html"

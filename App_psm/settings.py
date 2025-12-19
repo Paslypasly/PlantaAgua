@@ -103,11 +103,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'psm_db',
         'USER': 'psm_user',
-        'PASSWORD': 'psm123',
+        'PASSWORD': '1234',  # La que definiste al crear el rol
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
+
 
 
 
@@ -146,8 +147,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
-#STATICFILES_DIRS = [BASE_DIR / 'static']
+# (opcional) solo para collectstatic en producción
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

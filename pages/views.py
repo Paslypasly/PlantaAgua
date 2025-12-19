@@ -38,3 +38,4 @@ class ContactoView(FormView):
 
 class SoporteView(TemplateView):
     template_name = "pages/soporte.html"
+

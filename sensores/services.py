@@ -1,25 +1,28 @@
 # sensores/services.py
 from decimal import Decimal
 from django.utils import timezone
-from .models import Sensor, LecturaSensor, Alerta, ReglaControl
+from django.contrib.auth import get_user_model
+from .models import Sensor, LecturaSensor, Alerta, ReglaControl, Actuador
 
+User = get_user_model()
 
+# ==========================================================
+# REGISTRO DE LECTURAS AUTOMÁTICAS (MQTT / REST)
+# ==========================================================
 def registrar_lectura(sensor_codigo: str, valor: float):
     """
     Registrar lectura de un sensor desde JSON MQTT o REST.
-    Genera alertas automáticas si corresponde.
-    Evalúa reglas de control.
+    Ignora sensores desactivados.
     """
     try:
-        sensor = Sensor.objects.get(codigo=sensor_codigo, activo=True)
+        sensor = Sensor.objects.get(codigo=sensor_codigo)
+        if not sensor.activo:
+            print(f"⚠️ Sensor {sensor.codigo} está desactivado. Lectura ignorada.")
+            return None
     except Sensor.DoesNotExist:
+        print(f"❌ Sensor {sensor_codigo} no encontrado.")
         return None
 
-    lectura = LecturaSensor.objects.create(
-        sensor=sensor,
-        valor=Decimal(valor),
-        fecha_hora=timezone.now()
-    )
 
     # Evaluar estado del sensor
     if sensor.rango_min is not None and valor < sensor.rango_min:
@@ -33,7 +36,6 @@ def registrar_lectura(sensor_codigo: str, valor: float):
 
     sensor.save()
     evaluar_reglas(sensor, valor)
-
     return lectura
 
 
@@ -47,19 +49,59 @@ def _generar_alerta(sensor, mensaje, severidad):
 
 def evaluar_reglas(sensor, valor):
     reglas = sensor.reglas.all()
-
     for regla in reglas:
         if regla.condicion == "MAYOR" and valor > regla.umbral:
             _generar_alerta(sensor, regla.mensaje, "CRITICA")
             regla.actuador.estado_on = True
             regla.actuador.save()
-
-        if regla.condicion == "MENOR" and valor < regla.umbral:
+        elif regla.condicion == "MENOR" and valor < regla.umbral:
             _generar_alerta(sensor, regla.mensaje, "WARNING")
             regla.actuador.estado_on = False
             regla.actuador.save()
-
-        if regla.condicion == "IGUAL" and valor == regla.umbral:
+        elif regla.condicion == "IGUAL" and valor == regla.umbral:
             _generar_alerta(sensor, regla.mensaje, "INFO")
             regla.actuador.estado_on = False
             regla.actuador.save()
+
+
+# ==========================================================
+# FUNCIONES ADMINISTRATIVAS
+# ==========================================================
+def forzar_actuador(actuador_id: int, estado: bool, usuario: User):
+    """Forzar encendido/apagado de actuadores (solo ADMIN)."""
+    actuador = Actuador.objects.get(pk=actuador_id)
+    actuador.estado_on = estado
+    actuador.save(update_fields=["estado_on"])
+    Alerta.objects.create(
+        sensor=None,
+        mensaje=f"{usuario.username} forzó {actuador.nombre} a {'ON' if estado else 'OFF'}",
+        severidad="INFO",
+    )
+    return actuador
+
+
+def activar_sensor(sensor_id: int, activo: bool, usuario: User):
+    """Activa o desactiva un sensor desde el panel ADMIN."""
+    sensor = Sensor.objects.get(pk=sensor_id)
+    sensor.activo = activo
+    sensor.save(update_fields=["activo"])
+    Alerta.objects.create(
+        sensor=sensor,
+        mensaje=f"{usuario.username} {'activó' if activo else 'desactivó'} el sensor {sensor.codigo}",
+        severidad="INFO",
+    )
+    return sensor
+
+
+def actualizar_umbrales(sensor_id: int, rango_min: Decimal, rango_max: Decimal, usuario: User):
+    """Actualiza umbrales críticos manualmente."""
+    sensor = Sensor.objects.get(pk=sensor_id)
+    sensor.rango_min = rango_min
+    sensor.rango_max = rango_max
+    sensor.save(update_fields=["rango_min", "rango_max"])
+    Alerta.objects.create(
+        sensor=sensor,
+        mensaje=f"{usuario.username} ajustó umbrales ({rango_min} - {rango_max})",
+        severidad="INFO",
+    )
+    return sensor

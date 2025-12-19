@@ -22,13 +22,13 @@ urlpatterns = [
     path("produccion/", include("produccion.urls")),
     path("productos/", include("productos.urls", namespace="productos")),
     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
-
+    path("sensores/", include("sensores.urls")),
 ]
 
 
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 
 handler403 = "core.views.error_403_view"
 handler404 = "core.views.error_404_view"
