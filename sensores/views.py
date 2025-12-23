@@ -23,33 +23,30 @@ from .services import forzar_actuador, activar_sensor, actualizar_umbrales
 # ============================================================
 
 class DashboardPlantaView(LoginRequiredMixin, TemplateView):
-    """
-    Vista principal de planta + sensores.
-    Operario: la usa todo el día.
-    Gerente: la ve en modo lectura.
-    """
     template_name = "sensores/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        sensores_activos = Sensor.objects.filter(activo=True)
         total_sensores = Sensor.objects.count()
-        sensores_activos = Sensor.objects.filter(activo=True).count()
         alertas_abiertas = Alerta.objects.filter(atendida=False).count()
 
         ultimas_lecturas = (
             LecturaSensor.objects
             .select_related("sensor")
+            .filter(sensor__activo=True)
             .order_by("-fecha_hora")[:10]
         )
 
         context.update({
             "total_sensores": total_sensores,
-            "sensores_activos": sensores_activos,
+            "sensores_activos": sensores_activos.count(),
             "alertas_abiertas": alertas_abiertas,
             "ultimas_lecturas": ultimas_lecturas,
         })
         return context
+
 
 
 # ============================================================
@@ -61,6 +58,10 @@ class SensorListView(LoginRequiredMixin, ListView):
     template_name = "sensores/lista_sensores.html"
     context_object_name = "sensores"
     paginate_by = 20
+
+    def get_queryset(self):
+        return Sensor.objects.filter(activo=True)
+
 
 
 class SensorDetailView(LoginRequiredMixin, DetailView):
@@ -164,16 +165,18 @@ class LecturasHistorialView(LoginRequiredMixin, ListView):
     context_object_name = "lecturas"
     paginate_by = 50
 
-    def get_queryset(self):
-        qs = (
-            LecturaSensor.objects
-            .select_related("sensor")
-            .order_by("-fecha_hora")
-        )
-        sensor_id = self.request.GET.get("sensor")
-        if sensor_id:
-            qs = qs.filter(sensor_id=sensor_id)
-        return qs
+def get_queryset(self):
+    qs = (
+    LecturaSensor.objects
+    .select_related("sensor")
+    .filter(sensor__activo=True)
+     .order_by("-fecha_hora")
+    )
+    sensor_id = self.request.GET.get("sensor")
+    if sensor_id:
+        qs = qs.filter(sensor_id=sensor_id)
+    return qs
+
 
 
 # ============================================================

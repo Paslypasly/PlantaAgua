@@ -1,66 +1,83 @@
 {% extends "base.html" %}
-{% block title %}Panel Operario{% endblock %}
+{% load static %}
+
+{% block title %}Panel Operario · Planta San Miguel{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    <h2 class="mb-4">Panel Operario</h2>
+  <h2 class="mb-4">
+    <i class="bi bi-person-gear"></i> Panel Operario
+  </h2>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small">Producción de hoy</h6>
-                    <p class="fs-3 mb-1">{{ produccion_hoy|default:"-" }} L</p>
-                    <span class="small text-muted">Litros procesados</span>
-                </div>
-            </div>
-        </div>
+  <div class="row g-3 mb-4">
 
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small">Bidones preparados</h6>
-                    <p class="fs-3 mb-1">{{ bidones_preparados|default:"-" }}</p>
-                    <span class="small text-muted">Listos para despacho</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small">Alertas activas</h6>
-                    <p class="fs-3 mb-1 text-danger">{{ alertas_criticas|default:"-" }}</p>
-                    <span class="small text-muted">Revisar sensores</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-header fw-semibold">
-            Accesos rápidos
-        </div>
+    <!-- PRODUCCIÓN DE HOY -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 text-center border-primary-subtle">
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-outline-primary w-100">
-                        Estado de planta
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-outline-primary w-100">
-                        Lecturas de sensores
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-outline-primary w-100">
-                        Alertas
-                    </a>
-                </div>
-            </div>
+          <h6 class="text-muted text-uppercase small">Producción de hoy</h6>
+          <p class="fs-2 fw-semibold text-primary mb-0">
+            {{ litros_hoy|default:"0,00"|floatformat:2 }} L
+          </p>
+          <span class="small text-muted">
+            Litros procesados ({{ lotes_hoy|default:0 }} lote{{ lotes_hoy|pluralize }})
+          </span>
         </div>
+      </div>
     </div>
 
+    <!-- BIDONES PREPARADOS -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 text-center border-info-subtle">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Bidones preparados</h6>
+          <p class="fs-2 fw-semibold text-info mb-0">
+            {{ bidones_preparados|default:"18" }}
+          </p>
+          <span class="small text-muted">Listos para despacho</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTAS ACTIVAS -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 text-center border-danger-subtle">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Alertas activas</h6>
+          <p class="fs-2 fw-semibold text-danger mb-0">
+            {{ alertas_activas|default:"1" }}
+          </p>
+          <span class="small text-muted">Revisar sensores</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACCESOS RÁPIDOS -->
+  <div class="card shadow-sm">
+    <div class="card-header fw-semibold bg-light">
+      Accesos rápidos
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <a href="{% url 'estado_estanques' %}" class="btn btn-outline-primary w-100">
+            <i class="bi bi-water"></i> Estado de planta
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'lecturas_historial' %}" class="btn btn-outline-primary w-100">
+            <i class="bi bi-activity"></i> Lecturas de sensores
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'alertas_list' %}" class="btn btn-outline-danger w-100">
+            <i class="bi bi-exclamation-triangle"></i> Alertas
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -12,17 +12,24 @@ User = get_user_model()
 def registrar_lectura(sensor_codigo: str, valor: float):
     """
     Registrar lectura de un sensor desde JSON MQTT o REST.
-    Ignora sensores desactivados.
+    Ignora sensores desactivados o inexistentes.
     """
     try:
         sensor = Sensor.objects.get(codigo=sensor_codigo)
-        if not sensor.activo:
-            print(f"⚠️ Sensor {sensor.codigo} está desactivado. Lectura ignorada.")
-            return None
     except Sensor.DoesNotExist:
-        print(f"❌ Sensor {sensor_codigo} no encontrado.")
+        print(f"⚠️ Sensor {sensor_codigo} no existe en BD.")
         return None
 
+    # Si el sensor está desactivado → no procesa nada
+    if not sensor.activo:
+        print(f"⛔ Sensor {sensor.codigo} está desactivado. Lectura ignorada.")
+        return None
+
+    lectura = LecturaSensor.objects.create(
+        sensor=sensor,
+        valor=Decimal(valor),
+        fecha_hora=timezone.now()
+    )
 
     # Evaluar estado del sensor
     if sensor.rango_min is not None and valor < sensor.rango_min:
@@ -34,9 +41,10 @@ def registrar_lectura(sensor_codigo: str, valor: float):
     else:
         sensor.estado = "OK"
 
-    sensor.save()
+    sensor.save(update_fields=["estado"])
     evaluar_reglas(sensor, valor)
     return lectura
+
 
 
 def _generar_alerta(sensor, mensaje, severidad):

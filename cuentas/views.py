@@ -1,6 +1,9 @@
 # cuentas/views.py
 from django.contrib import messages
 from django.contrib import messages
+from django.utils import timezone
+from django.db import models  # ✅ <-- AGREGA ESTA LÍNEA
+from produccion.models import LoteProduccion
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
@@ -190,9 +193,36 @@ class PanelAdminView(LoginRequiredMixin, RolRequiredMixin, TemplateView):
 
 
 
+from django.utils import timezone
+from produccion.models import LoteProduccion
+
+
 class PanelOperarioView(LoginRequiredMixin, RolRequiredMixin, TemplateView):
     template_name = "cuentas/panel_operario.html"
     rol_requerido = Usuario.Rol.OPERARIO
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        hoy = timezone.localdate()
+
+        # Obtener total de litros producidos hoy
+        litros_hoy = (
+            LoteProduccion.objects
+            .filter(fecha=hoy)
+            .aggregate(total=models.Sum("litros"))
+            .get("total") or 0
+        )
+
+        # Si quieres mostrar también el número de lotes de hoy
+        lotes_hoy = LoteProduccion.objects.filter(fecha=hoy).count()
+
+        ctx["litros_hoy"] = litros_hoy
+        ctx["lotes_hoy"] = lotes_hoy
+        ctx["hoy"] = hoy
+
+        return ctx
+
 
 
 class PanelConductorView(LoginRequiredMixin, RolRequiredMixin, TemplateView):
